@@ -11,11 +11,12 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public final class BlockUtil {
-    private static final BlockHandler HANDLER;
-    private static final Map<Supplier<Boolean>, Supplier<BlockHandler>> HANDLERS = new LinkedHashMap<>();
+    private static final AtomicReference<BlockHandler> HANDLER_REFERENCE = new AtomicReference<>();
+    private static final Map<BooleanSupplier, Supplier<BlockHandler>> HANDLERS = new LinkedHashMap<>();
     private static final BlockFace[] FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
     static {
@@ -27,27 +28,14 @@ public final class BlockUtil {
         registerWithVersion("v1_14_R1");
         registerWithVersion("v1_13_R2");
         registerWithVersion("v1_12_R1");
-
-        AtomicReference<BlockHandler> handler = new AtomicReference<>();
-        HANDLERS.forEach((supplier, blockHandlerSupplier) -> {
-            if (Boolean.TRUE.equals(supplier.get())) {
-                BlockHandler blockHandler = blockHandlerSupplier.get();
-                if (blockHandler != null) {
-                    handler.set(blockHandler);
-                }
-            }
-        });
-        if (handler.get() == null) {
-            handler.set(new FallbackBlockHandler());
-        }
-        HANDLER = handler.get();
     }
 
     private BlockUtil() {
         // EMPTY
     }
 
-    private static void register(Supplier<Boolean> supplier, Supplier<BlockHandler> blockHandlerSupplier) {
+    public static void register(BooleanSupplier supplier, Supplier<BlockHandler> blockHandlerSupplier) {
+        HANDLER_REFERENCE.set(null);
         HANDLERS.put(supplier, blockHandlerSupplier);
     }
 
@@ -70,7 +58,25 @@ public final class BlockUtil {
     }
 
     public static BlockHandler getHandler() {
-        return HANDLER;
+        BlockHandler handler = HANDLER_REFERENCE.get();
+        if (handler == null) {
+            for (Map.Entry<BooleanSupplier, Supplier<BlockHandler>> entry : HANDLERS.entrySet()) {
+                BooleanSupplier supplier = entry.getKey();
+                Supplier<BlockHandler> blockHandlerSupplier = entry.getValue();
+                if (supplier.getAsBoolean()) {
+                    BlockHandler blockHandler = blockHandlerSupplier.get();
+                    if (blockHandler != null) {
+                        handler = blockHandler;
+                        break;
+                    }
+                }
+            }
+            if (handler == null) {
+                handler = new FallbackBlockHandler();
+            }
+            HANDLER_REFERENCE.set(handler);
+        }
+        return handler;
     }
 
     public static boolean isSurrounded(Block block) {
