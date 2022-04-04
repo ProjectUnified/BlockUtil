@@ -47,6 +47,21 @@
         </dependency>
         <dependency>
             <groupId>me.hsgamer</groupId>
+            <artifactId>block-util-v1_12_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>me.hsgamer</groupId>
+            <artifactId>block-util-v1_13_R2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>me.hsgamer</groupId>
+            <artifactId>block-util-v1_14_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>me.hsgamer</groupId>
             <artifactId>block-util-v1_15_R1</artifactId>
             <version>${project.version}</version>
         </dependency>
