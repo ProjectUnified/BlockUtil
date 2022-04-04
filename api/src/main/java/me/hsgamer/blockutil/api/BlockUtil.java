@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 public final class BlockUtil {
     private static final BlockHandler HANDLER;
     private static final Map<Supplier<Boolean>, Supplier<BlockHandler>> HANDLERS = new LinkedHashMap<>();
+    private static final BlockFace[] FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
     static {
         registerWithVersion("v1_18_R2");
@@ -69,22 +70,17 @@ public final class BlockUtil {
     }
 
     public static boolean isSurrounded(Block block) {
-        final Block east = block.getRelative(BlockFace.EAST);
-        final Block west = block.getRelative(BlockFace.WEST);
-        final Block south = block.getRelative(BlockFace.SOUTH);
-        final Block north = block.getRelative(BlockFace.NORTH);
-        final Block up = block.getRelative(BlockFace.UP);
-        final Block down = block.getRelative(BlockFace.DOWN);
-        return !east.getType().isTransparent()
-                && !west.getType().isTransparent()
-                && !up.getType().isTransparent()
-                && !down.getType().isTransparent()
-                && !south.getType().isTransparent()
-                && !north.getType().isTransparent();
+        for (BlockFace face : FACES) {
+            Material material = block.getRelative(face).getType();
+            if (material.name().contains("AIR") || material.isTransparent()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void updateLight(Block block) {
-        if (block.getType() != Material.AIR && !isSurrounded(block)) {
+        if (!isSurrounded(block)) {
             getHandler().updateLight(block);
         }
     }
