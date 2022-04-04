@@ -9,7 +9,10 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("deprecation")
 public class NMSBlockHandler implements BlockHandler {
+    private final IBlockData air = Blocks.AIR.getBlockData();
+
     @Override
     public void setBlock(Block block, Material material, byte data, boolean applyPhysics, boolean doPlace) {
         net.minecraft.server.v1_12_R1.World world = ((CraftWorld) block.getWorld()).getHandle();
@@ -17,11 +20,8 @@ public class NMSBlockHandler implements BlockHandler {
         Chunk chunk = ((CraftChunk) block.getChunk()).getHandle();
         int combined = material.getId() + (data << 12);
         IBlockData blockData = net.minecraft.server.v1_12_R1.Block.getByCombinedId(combined);
-        if (applyPhysics) {
-            world.setTypeAndData(position, blockData, 3);
-        } else {
-            world.setTypeAndData(position, blockData, 2);
-        }
+        world.setTypeAndData(position, air, 0);
+        world.setTypeAndData(position, blockData, applyPhysics ? 3 : 18);
         chunk.a(position, blockData);
     }
 
