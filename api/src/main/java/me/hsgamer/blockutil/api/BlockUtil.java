@@ -23,6 +23,7 @@ public final class BlockUtil {
         registerWithVersion("v1_18_R1");
         registerWithVersion("v1_17_R1");
         registerWithVersion("v1_16_R3");
+        registerWithVersion("v1_15_R1");
 
         AtomicReference<BlockHandler> handler = new AtomicReference<>();
         HANDLERS.forEach((supplier, blockHandlerSupplier) -> {

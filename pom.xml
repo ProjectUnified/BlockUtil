@@ -11,12 +11,13 @@
 
     <modules>
         <module>abstraction</module>
-        <module>v1_16_R3</module>
-        <module>v1_17_R1</module>
-        <module>v1_18_R1</module>
-        <module>v1_18_R2</module>
         <module>fallback</module>
         <module>api</module>
+        <module>v1_18_R2</module>
+        <module>v1_18_R1</module>
+        <module>v1_17_R1</module>
+        <module>v1_16_R3</module>
+        <module>v1_15_R1</module>
     </modules>
 
     <properties>
