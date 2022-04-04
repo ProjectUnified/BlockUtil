@@ -3,6 +3,7 @@ package me.hsgamer.blockutil.fallback;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -11,6 +12,7 @@ import java.lang.reflect.Method;
 
 public class FallbackBlockHandler implements BlockHandler {
     private final Method setDataMethod;
+    private final Method refreshMethod;
 
     public FallbackBlockHandler() {
         Method method;
@@ -20,6 +22,13 @@ public class FallbackBlockHandler implements BlockHandler {
             method = null;
         }
         setDataMethod = method;
+
+        try {
+            method = World.class.getDeclaredMethod("refreshChunk", int.class, int.class);
+        } catch (NoSuchMethodException e) {
+            method = null;
+        }
+        refreshMethod = method;
     }
 
     @Override
@@ -42,6 +51,12 @@ public class FallbackBlockHandler implements BlockHandler {
 
     @Override
     public void sendChunkUpdate(Player player, Chunk chunk) {
-        // EMPTY
+        if (refreshMethod != null) {
+            try {
+                refreshMethod.invoke(chunk.getWorld(), chunk.getX(), chunk.getZ());
+            } catch (IllegalAccessException | InvocationTargetException ignored) {
+                // IGNORED
+            }
+        }
     }
 }
