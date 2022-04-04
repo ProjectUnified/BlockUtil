@@ -41,10 +41,18 @@ public final class BlockUtil {
     }
 
     private static void registerWithVersion(String version) {
-        register(() -> Bukkit.getServer().getClass().getPackage().getName().toLowerCase(Locale.ROOT).contains(version.toLowerCase(Locale.ROOT)), getVersionHandlerSupplier(version));
+        register(getVersionChecker(version), getVersionHandlerSupplier(version));
     }
 
-    private static Supplier<BlockHandler> getHandlerSupplier(String className) {
+    private static Supplier<BlockHandler> getVersionHandlerSupplier(String version) {
+        return getHandlerSupplier("me.hsgamer.blockutil.nms." + version.toLowerCase(Locale.ROOT) + ".NMSBlockHandler");
+    }
+
+    public static BooleanSupplier getVersionChecker(String version) {
+        return () -> Bukkit.getServer().getClass().getPackage().getName().toLowerCase(Locale.ROOT).contains(version.toLowerCase(Locale.ROOT));
+    }
+
+    public static Supplier<BlockHandler> getHandlerSupplier(String className) {
         return () -> {
             try {
                 return (BlockHandler) Class.forName(className).getDeclaredConstructor().newInstance();
@@ -52,10 +60,6 @@ public final class BlockUtil {
                 return null;
             }
         };
-    }
-
-    private static Supplier<BlockHandler> getVersionHandlerSupplier(String version) {
-        return getHandlerSupplier("me.hsgamer.blockutil.nms." + version.toLowerCase(Locale.ROOT) + ".NMSBlockHandler");
     }
 
     public static BlockHandler getHandler() {
