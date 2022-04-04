@@ -15,7 +15,7 @@ public class FallbackBlockHandler implements BlockHandler {
     public FallbackBlockHandler() {
         Method method;
         try {
-            method = Block.class.getDeclaredMethod("setData", byte.class);
+            method = Block.class.getDeclaredMethod("setData", byte.class, boolean.class);
         } catch (NoSuchMethodException e) {
             method = null;
         }
@@ -23,12 +23,12 @@ public class FallbackBlockHandler implements BlockHandler {
     }
 
     @Override
-    public void setBlock(Block block, Material material, byte data, boolean applyPhysics) {
-        block.setType(material);
+    public void setBlock(Block block, Material material, byte data, boolean applyPhysics, boolean doPlace) {
+        block.setType(material, applyPhysics);
 
         if (setDataMethod != null) {
             try {
-                setDataMethod.invoke(block, data);
+                setDataMethod.invoke(block, data, applyPhysics);
             } catch (IllegalAccessException | InvocationTargetException ignored) {
                 // IGNORED
             }

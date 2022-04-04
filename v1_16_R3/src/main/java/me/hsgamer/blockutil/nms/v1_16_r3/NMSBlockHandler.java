@@ -16,13 +16,13 @@ public class NMSBlockHandler implements BlockHandler {
     private final IBlockData air = ((CraftBlockData) Bukkit.createBlockData(Material.AIR)).getState();
 
     @Override
-    public void setBlock(Block block, Material material, byte data, boolean applyPhysics) {
+    public void setBlock(Block block, Material material, byte data, boolean applyPhysics, boolean doPlace) {
         BlockPosition position = new BlockPosition(block.getX(), block.getY(), block.getZ());
         Chunk chunk = ((CraftChunk) block.getChunk()).getHandle();
         net.minecraft.server.v1_16_R3.Block nmsBlock = CraftMagicNumbers.getBlock(material);
         IBlockData blockData = nmsBlock.getBlockData();
-        chunk.setType(position, air, applyPhysics);
-        chunk.setType(position, blockData, applyPhysics);
+        chunk.setType(position, air, false, false);
+        chunk.setType(position, blockData, applyPhysics, doPlace);
     }
 
     @Override
