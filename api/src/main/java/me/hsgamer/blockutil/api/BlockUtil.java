@@ -77,6 +77,7 @@ public final class BlockUtil {
                 }
             }
             if (handler == null) {
+                Bukkit.getLogger().info("BlockUtil: No NMS handler found, using fallback");
                 handler = new FallbackBlockHandler();
             }
             HANDLER_REFERENCE.set(handler);
