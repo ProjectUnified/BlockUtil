@@ -1,6 +1,7 @@
 package me.hsgamer.blockutil.extra.box;
 
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
 public class BlockBox {
     public final int minX;
@@ -23,5 +24,9 @@ public class BlockBox {
 
     public BlockBox(Location loc1, Location loc2, boolean maxInclusive) {
         this(loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ(), maxInclusive);
+    }
+
+    public BlockBox(Vector vec1, Vector vec2, boolean maxInclusive) {
+        this(vec1.getBlockX(), vec1.getBlockY(), vec1.getBlockZ(), vec2.getBlockX(), vec2.getBlockY(), vec2.getBlockZ(), maxInclusive);
     }
 }
