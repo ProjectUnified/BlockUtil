@@ -7,16 +7,16 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public final class BlockUtil {
     private static final AtomicReference<BlockHandler> HANDLER_REFERENCE = new AtomicReference<>();
-    private static final Map<BooleanSupplier, Supplier<BlockHandler>> HANDLERS = new LinkedHashMap<>();
+    private static final Deque<BlockHandlerPair> HANDLER_STACK = new ArrayDeque<>();
     private static final BlockFace[] FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
     static {
@@ -37,7 +37,7 @@ public final class BlockUtil {
 
     public static void register(BooleanSupplier supplier, Supplier<BlockHandler> blockHandlerSupplier) {
         HANDLER_REFERENCE.set(null);
-        HANDLERS.put(supplier, blockHandlerSupplier);
+        HANDLER_STACK.push(new BlockHandlerPair(supplier, blockHandlerSupplier));
     }
 
     private static void registerWithVersion(String version) {
@@ -65,9 +65,9 @@ public final class BlockUtil {
     public static BlockHandler getHandler() {
         BlockHandler handler = HANDLER_REFERENCE.get();
         if (handler == null) {
-            for (Map.Entry<BooleanSupplier, Supplier<BlockHandler>> entry : HANDLERS.entrySet()) {
-                BooleanSupplier supplier = entry.getKey();
-                Supplier<BlockHandler> blockHandlerSupplier = entry.getValue();
+            for (BlockHandlerPair entry : HANDLER_STACK) {
+                BooleanSupplier supplier = entry.supplier;
+                Supplier<BlockHandler> blockHandlerSupplier = entry.blockHandler;
                 if (supplier.getAsBoolean()) {
                     BlockHandler blockHandler = blockHandlerSupplier.get();
                     if (blockHandler != null) {
@@ -98,6 +98,16 @@ public final class BlockUtil {
     public static void updateLight(Block block) {
         if (!isSurrounded(block)) {
             getHandler().updateLight(block);
+        }
+    }
+
+    private static class BlockHandlerPair {
+        private final BooleanSupplier supplier;
+        private final Supplier<BlockHandler> blockHandler;
+
+        private BlockHandlerPair(BooleanSupplier supplier, Supplier<BlockHandler> blockHandler) {
+            this.supplier = supplier;
+            this.blockHandler = blockHandler;
         }
     }
 }
