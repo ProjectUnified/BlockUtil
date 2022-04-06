@@ -10,7 +10,7 @@ public class BlockBox {
     public final int maxX;
     public final int maxY;
     public final int maxZ;
-    public final boolean maxXInclusive;
+    public final boolean maxInclusive;
 
     public BlockBox(int x1, int y1, int z1, int x2, int y2, int z2, boolean maxInclusive) {
         minX = Math.min(x1, x2);
@@ -19,7 +19,7 @@ public class BlockBox {
         maxX = Math.max(x1, x2) - (maxInclusive ? 0 : 1);
         maxY = Math.max(y1, y2) - (maxInclusive ? 0 : 1);
         maxZ = Math.max(z1, z2) - (maxInclusive ? 0 : 1);
-        this.maxXInclusive = maxInclusive;
+        this.maxInclusive = maxInclusive;
     }
 
     public BlockBox(Location loc1, Location loc2, boolean maxInclusive) {

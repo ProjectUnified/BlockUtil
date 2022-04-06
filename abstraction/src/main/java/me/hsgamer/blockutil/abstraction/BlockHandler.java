@@ -29,7 +29,7 @@ public interface BlockHandler {
         setBlock(block, material, (byte) 0, applyPhysics);
     }
 
-    default void setChunkUpdate(Chunk chunk) {
+    default void sendChunkUpdate(Chunk chunk) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getWorld().equals(chunk.getWorld())) {
                 sendChunkUpdate(player, chunk);
