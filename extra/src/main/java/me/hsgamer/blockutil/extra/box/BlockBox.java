@@ -16,9 +16,9 @@ public class BlockBox {
         minX = Math.min(x1, x2);
         minY = Math.min(y1, y2);
         minZ = Math.min(z1, z2);
-        maxX = Math.max(x1, x2) - (maxInclusive ? 0 : 1);
-        maxY = Math.max(y1, y2) - (maxInclusive ? 0 : 1);
-        maxZ = Math.max(z1, z2) - (maxInclusive ? 0 : 1);
+        maxX = Math.max(x1, x2) + (maxInclusive ? 1 : 0);
+        maxY = Math.max(y1, y2) + (maxInclusive ? 1 : 0);
+        maxZ = Math.max(z1, z2) + (maxInclusive ? 1 : 0);
         this.maxInclusive = maxInclusive;
     }
 
@@ -28,5 +28,17 @@ public class BlockBox {
 
     public BlockBox(Vector vec1, Vector vec2, boolean maxInclusive) {
         this(vec1.getBlockX(), vec1.getBlockY(), vec1.getBlockZ(), vec2.getBlockX(), vec2.getBlockY(), vec2.getBlockZ(), maxInclusive);
+    }
+
+    public boolean contains(double x, double y, double z) {
+        return x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ;
+    }
+
+    public boolean contains(Vector vec) {
+        return contains(vec.getX(), vec.getY(), vec.getZ());
+    }
+
+    public boolean contains(Location loc) {
+        return contains(loc.getX(), loc.getY(), loc.getZ());
     }
 }
