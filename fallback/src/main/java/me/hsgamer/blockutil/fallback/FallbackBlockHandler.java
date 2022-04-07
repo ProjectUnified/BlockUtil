@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 public class FallbackBlockHandler implements BlockHandler {
     private final Method setDataMethod;
     private final Method refreshMethod;
+    private final Method setBlockDataMethod;
 
     public FallbackBlockHandler() {
         Method method;
@@ -29,6 +30,26 @@ public class FallbackBlockHandler implements BlockHandler {
             method = null;
         }
         refreshMethod = method;
+
+        try {
+            Class<?> clazz = Class.forName("org.bukkit.block.data.BlockData");
+            method = Block.class.getDeclaredMethod("setBlockData", clazz, boolean.class);
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
+            method = null;
+        }
+        setBlockDataMethod = method;
+    }
+
+    @Override
+    public void setBlockData(Block block, Object blockData, boolean applyPhysics, boolean doPlace) throws IllegalArgumentException {
+        BlockHandler.super.setBlockData(block, blockData, applyPhysics, doPlace);
+        if (setBlockDataMethod != null) {
+            try {
+                setBlockDataMethod.invoke(block, blockData, applyPhysics);
+            } catch (IllegalAccessException | InvocationTargetException ignored) {
+                // IGNORED
+            }
+        }
     }
 
     @Override

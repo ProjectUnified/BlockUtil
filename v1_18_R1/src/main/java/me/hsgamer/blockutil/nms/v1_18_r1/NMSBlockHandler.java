@@ -17,16 +17,27 @@ import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 
 public class NMSBlockHandler implements BlockHandler {
-    private final IBlockData air = ((CraftBlockData) Bukkit.createBlockData(Material.AIR)).getState();
+    private static final IBlockData air = ((CraftBlockData) Bukkit.createBlockData(Material.AIR)).getState();
+
+    public static void setBlock(Block block, IBlockData blockData, boolean applyPhysics, boolean doPlace) {
+        BlockPosition position = new BlockPosition(block.getX(), block.getY(), block.getZ());
+        Chunk chunk = ((CraftChunk) block.getChunk()).getHandle();
+        chunk.setBlockState(position, air, false, false);
+        chunk.setBlockState(position, blockData, applyPhysics, doPlace);
+    }
+
+    @Override
+    public void setBlockData(Block block, Object blockData, boolean applyPhysics, boolean doPlace) throws IllegalArgumentException {
+        BlockHandler.super.setBlockData(block, blockData, applyPhysics, doPlace);
+        IBlockData nmsBlockData = ((CraftBlockData) blockData).getState();
+        setBlock(block, nmsBlockData, applyPhysics, doPlace);
+    }
 
     @Override
     public void setBlock(Block block, Material material, byte data, boolean applyPhysics, boolean doPlace) {
-        BlockPosition position = new BlockPosition(block.getX(), block.getY(), block.getZ());
-        Chunk chunk = ((CraftChunk) block.getChunk()).getHandle();
         net.minecraft.world.level.block.Block nmsBlock = CraftMagicNumbers.getBlock(material);
         IBlockData blockData = nmsBlock.n();
-        chunk.setBlockState(position, air, false, false);
-        chunk.setBlockState(position, blockData, applyPhysics, doPlace);
+        setBlock(block, blockData, applyPhysics, doPlace);
     }
 
     @Override
