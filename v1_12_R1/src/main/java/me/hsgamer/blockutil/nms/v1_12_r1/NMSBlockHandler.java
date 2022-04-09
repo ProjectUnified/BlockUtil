@@ -16,6 +16,7 @@ public class NMSBlockHandler implements BlockHandler {
         net.minecraft.server.v1_12_R1.World world = ((CraftWorld) block.getWorld()).getHandle();
         BlockPosition position = new BlockPosition(block.getX(), block.getY(), block.getZ());
         Chunk chunk = ((CraftChunk) block.getChunk()).getHandle();
+        chunk.tileEntities.remove(position);
         int combined = material.getId() + (data << 12);
         IBlockData blockData = net.minecraft.server.v1_12_R1.Block.getByCombinedId(combined);
         chunk.a(position, blockData);
