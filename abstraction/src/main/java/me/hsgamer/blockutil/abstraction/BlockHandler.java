@@ -13,6 +13,16 @@ public interface BlockHandler {
 
     void sendChunkUpdate(Player player, Chunk chunk);
 
+    default void updateLight(Chunk chunk) {
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                for (int y = 0; y < chunk.getWorld().getMaxHeight(); y++) {
+                    updateLight(chunk.getBlock(x, y, z));
+                }
+            }
+        }
+    }
+
     default void setBlockData(Block block, Object blockData, boolean applyPhysics, boolean doPlace) throws IllegalArgumentException {
         try {
             if (!Class.forName("org.bukkit.block.data.BlockData").isAssignableFrom(blockData.getClass())) {

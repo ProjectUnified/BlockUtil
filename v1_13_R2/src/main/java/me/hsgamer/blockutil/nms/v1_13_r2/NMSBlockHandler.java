@@ -40,7 +40,13 @@ public class NMSBlockHandler implements BlockHandler {
     public void updateLight(Block block) {
         BlockPosition position = new BlockPosition(block.getX(), block.getY(), block.getZ());
         World world = ((CraftWorld) block.getWorld()).getHandle();
-        world.c(EnumSkyBlock.BLOCK, position);
+        world.r(position);
+    }
+
+    @Override
+    public void updateLight(org.bukkit.Chunk chunk) {
+        Chunk nmsChunk = ((CraftChunk) chunk).getHandle();
+        nmsChunk.initLighting();
     }
 
     @Override
