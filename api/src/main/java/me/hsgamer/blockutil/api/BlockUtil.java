@@ -3,9 +3,11 @@ package me.hsgamer.blockutil.api;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
 import me.hsgamer.blockutil.fallback.FallbackBlockHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -18,6 +20,7 @@ public final class BlockUtil {
     private static final AtomicReference<BlockHandler> HANDLER_REFERENCE = new AtomicReference<>();
     private static final Deque<BlockHandlerPair> HANDLER_STACK = new ArrayDeque<>();
     private static final BlockFace[] FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
+    private static int offsetChunkUpdate = 15;
 
     static {
         registerWithVersion("v1_18_R2");
@@ -99,6 +102,29 @@ public final class BlockUtil {
         if (!isSurrounded(block)) {
             getHandler().updateLight(block);
         }
+    }
+
+    public static void sendChunkUpdate(Chunk chunk) {
+        if (!chunk.isLoaded()) return;
+        BlockHandler handler = getHandler();
+        int chunkX = chunk.getX();
+        int chunkZ = chunk.getZ();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!player.getWorld().equals(chunk.getWorld())) continue;
+            Chunk playerChunk = player.getLocation().getChunk();
+            int playerChunkX = playerChunk.getX();
+            int playerChunkZ = playerChunk.getZ();
+            int distanceX = Math.abs(playerChunkX - chunkX);
+            int distanceZ = Math.abs(playerChunkZ - chunkZ);
+            if (distanceX < offsetChunkUpdate && distanceZ < offsetChunkUpdate) {
+                handler.sendChunkUpdate(player, chunk);
+            }
+        }
+    }
+
+    public static void setOffsetChunkUpdate(int offsetChunkUpdate) {
+        BlockUtil.offsetChunkUpdate = offsetChunkUpdate;
     }
 
     private static class BlockHandlerPair {

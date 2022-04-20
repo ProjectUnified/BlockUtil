@@ -1,6 +1,5 @@
 package me.hsgamer.blockutil.abstraction;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,16 +11,6 @@ public interface BlockHandler {
     void updateLight(Block block);
 
     void sendChunkUpdate(Player player, Chunk chunk);
-
-    default void updateLight(Chunk chunk) {
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                for (int y = 0; y < chunk.getWorld().getMaxHeight(); y++) {
-                    updateLight(chunk.getBlock(x, y, z));
-                }
-            }
-        }
-    }
 
     default void setBlockData(Block block, Object blockData, boolean applyPhysics, boolean doPlace) throws IllegalArgumentException {
         try {
@@ -47,13 +36,5 @@ public interface BlockHandler {
 
     default void setBlock(Block block, Material material, boolean applyPhysics) {
         setBlock(block, material, (byte) 0, applyPhysics);
-    }
-
-    default void sendChunkUpdate(Chunk chunk) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getWorld().equals(chunk.getWorld())) {
-                sendChunkUpdate(player, chunk);
-            }
-        }
     }
 }
