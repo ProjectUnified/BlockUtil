@@ -7,7 +7,7 @@
     <groupId>me.hsgamer</groupId>
     <artifactId>block-util</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 
     <modules>
         <module>abstraction</module>
