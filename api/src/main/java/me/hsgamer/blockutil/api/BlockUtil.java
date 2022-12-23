@@ -1,5 +1,6 @@
 package me.hsgamer.blockutil.api;
 
+import com.cryptomorin.xseries.XMaterial;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
 import me.hsgamer.blockutil.fawe.FaweBlockHandler;
 import me.hsgamer.blockutil.vanilla.VanillaBlockHandler;
@@ -17,7 +18,7 @@ public final class BlockUtil {
     }
 
     public static BlockHandler getHandler(Plugin plugin) {
-        if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
+        if (XMaterial.supports(16) && Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
             return new FaweBlockHandler(plugin);
         } else {
             return new VanillaBlockHandler(plugin);
