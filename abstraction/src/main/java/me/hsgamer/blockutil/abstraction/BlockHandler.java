@@ -1,50 +1,72 @@
 package me.hsgamer.blockutil.abstraction;
 
-import org.bukkit.Chunk;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import com.cryptomorin.xseries.XMaterial;
+import com.lewdev.probabilitylib.ProbabilityCollection;
+import me.hsgamer.hscore.bukkit.block.box.BlockBox;
+import me.hsgamer.hscore.bukkit.block.iterator.VectorIterator;
+import me.hsgamer.hscore.bukkit.block.iterator.impl.LinearVectorIterator;
+import me.hsgamer.hscore.common.Pair;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.util.Vector;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 public interface BlockHandler {
-    void setBlock(Block block, Material material, byte data, boolean applyPhysics, boolean doPlace);
+    static Pair<World, VectorIterator> iterator(Collection<Location> locations) {
+        World world = locations.stream().findAny().map(Location::getWorld).orElse(null);
+        VectorIterator wrappedVectorIterator = new VectorIterator() {
+            Iterator<Vector> vectorIterator = locations.stream().map(Location::toVector).iterator();
 
-    void updateLight(Block block);
-
-    void sendChunkUpdate(Player player, Chunk chunk);
-
-    default void updateLight(Chunk chunk) {
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                for (int y = 0; y < chunk.getWorld().getMaxHeight(); y++) {
-                    updateLight(chunk.getBlock(x, y, z));
-                }
+            @Override
+            public void reset() {
+                vectorIterator = locations.stream().map(Location::toVector).iterator();
             }
-        }
-    }
 
-    default void setBlockData(Block block, Object blockData, boolean applyPhysics, boolean doPlace) throws IllegalArgumentException {
-        try {
-            if (!Class.forName("org.bukkit.block.data.BlockData").isAssignableFrom(blockData.getClass())) {
-                throw new IllegalArgumentException("The data is not a valid BlockData");
+            @Override
+            public boolean hasNext() {
+                return vectorIterator.hasNext();
             }
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("The data is not a valid BlockData");
-        }
+
+            @Override
+            public Vector next() {
+                return vectorIterator.next();
+            }
+        };
+        return Pair.of(world, wrappedVectorIterator);
     }
 
-    default void setBlock(Block block, Material material, byte data, boolean applyPhysics) {
-        setBlock(block, material, data, applyPhysics, true);
+    BlockProcess setRandomBlocks(World world, VectorIterator iterator, ProbabilityCollection<XMaterial> probabilityCollection);
+
+    default BlockProcess setRandomBlocks(World world, BlockBox blockBox, ProbabilityCollection<XMaterial> probabilityCollection) {
+        return setRandomBlocks(world, new LinearVectorIterator(blockBox), probabilityCollection);
     }
 
-    default void setBlock(Block block, Material material, byte data) {
-        setBlock(block, material, data, true);
+    default BlockProcess setRandomBlocks(Collection<Location> locations, ProbabilityCollection<XMaterial> probabilityCollection) {
+        Pair<World, VectorIterator> pair = iterator(locations);
+        return setRandomBlocks(pair.getKey(), pair.getValue(), probabilityCollection);
     }
 
-    default void setBlock(Block block, Material material) {
-        setBlock(block, material, (byte) 0);
+    BlockProcess clearBlocks(World world, VectorIterator iterator);
+
+    default BlockProcess clearBlocks(World world, BlockBox blockBox) {
+        return clearBlocks(world, new LinearVectorIterator(blockBox));
     }
 
-    default void setBlock(Block block, Material material, boolean applyPhysics) {
-        setBlock(block, material, (byte) 0, applyPhysics);
+    default BlockProcess clearBlocks(Collection<Location> locations) {
+        Pair<World, VectorIterator> pair = iterator(locations);
+        return clearBlocks(pair.getKey(), pair.getValue());
+    }
+
+    void clearBlockFast(World world, VectorIterator iterator);
+
+    default void clearBlocksFast(World world, BlockBox blockBox) {
+        clearBlockFast(world, new LinearVectorIterator(blockBox));
+    }
+
+    default void clearBlocksFast(Collection<Location> locations) {
+        Pair<World, VectorIterator> pair = iterator(locations);
+        clearBlockFast(pair.getKey(), pair.getValue());
     }
 }
