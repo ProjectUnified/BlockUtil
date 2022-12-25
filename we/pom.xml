@@ -9,13 +9,26 @@
         <version>2.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>block-util-vanilla</artifactId>
+    <artifactId>block-util-we</artifactId>
+
+    <repositories>
+        <repository>
+            <id>enginehub-repo</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
             <groupId>me.hsgamer</groupId>
             <artifactId>block-util-abstraction</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>7.2.13</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
