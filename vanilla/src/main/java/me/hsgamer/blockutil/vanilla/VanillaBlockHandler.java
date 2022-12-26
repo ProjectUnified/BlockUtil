@@ -5,6 +5,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.lewdev.probabilitylib.ProbabilityCollection;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
+import me.hsgamer.blockutil.abstraction.BlockUtilSetting;
 import me.hsgamer.hscore.bukkit.block.iterator.VectorIterator;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -16,8 +17,8 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.concurrent.CompletableFuture;
 
 public class VanillaBlockHandler implements BlockHandler {
-    private static final int BLOCKS_PER_TICK = Math.max(1, Integer.parseInt(System.getProperty("blockutil.blocksPerTick", "50")));
-    private static final long BLOCK_DELAY = Math.max(0, Long.parseLong(System.getProperty("blockutil.blockDelay", "0")));
+    private final int blocksPerTick = Math.max(1, BlockUtilSetting.BLOCKS_PER_TICK.get());
+    private final long blockDelay = Math.max(0, BlockUtilSetting.BLOCK_DELAY.get());
     private final Plugin plugin;
 
     public VanillaBlockHandler(Plugin plugin) {
@@ -30,7 +31,7 @@ public class VanillaBlockHandler implements BlockHandler {
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
-                for (int i = 0; i < BLOCKS_PER_TICK; i++) {
+                for (int i = 0; i < blocksPerTick; i++) {
                     if (iterator.hasNext()) {
                         Block block = iterator.nextLocation(world).getBlock();
                         XBlock.setType(block, probabilityCollection.get(), false);
@@ -41,7 +42,7 @@ public class VanillaBlockHandler implements BlockHandler {
                     }
                 }
             }
-        }.runTaskTimer(plugin, BLOCK_DELAY, BLOCK_DELAY);
+        }.runTaskTimer(plugin, blockDelay, blockDelay);
         return new BlockProcess() {
             @Override
             public boolean isDone() {
@@ -61,7 +62,7 @@ public class VanillaBlockHandler implements BlockHandler {
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
-                for (int i = 0; i < BLOCKS_PER_TICK; i++) {
+                for (int i = 0; i < blocksPerTick; i++) {
                     if (iterator.hasNext()) {
                         Block block = iterator.nextLocation(world).getBlock();
                         if (block.getType() != Material.AIR) {
@@ -74,7 +75,7 @@ public class VanillaBlockHandler implements BlockHandler {
                     }
                 }
             }
-        }.runTaskTimer(plugin, BLOCK_DELAY, BLOCK_DELAY);
+        }.runTaskTimer(plugin, blockDelay, blockDelay);
         return new BlockProcess() {
             @Override
             public boolean isDone() {
