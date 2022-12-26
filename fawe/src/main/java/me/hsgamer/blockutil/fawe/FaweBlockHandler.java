@@ -11,6 +11,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
+import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
 import me.hsgamer.hscore.bukkit.block.box.BlockBox;
 import me.hsgamer.hscore.bukkit.block.iterator.VectorIterator;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class FaweBlockHandler implements BlockHandler {
+    private final int maxBlocks = BlockHandlerSettings.MAX_BLOCKS.get();
     private final Plugin plugin;
 
     public FaweBlockHandler(Plugin plugin) {
@@ -53,6 +55,7 @@ public class FaweBlockHandler implements BlockHandler {
         BukkitTask task = Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                     .world(bukkitWorld)
+                    .maxBlocks(maxBlocks)
                     .fastMode(true)
                     .changeSetNull()
                     .limitUnlimited()
@@ -88,6 +91,7 @@ public class FaweBlockHandler implements BlockHandler {
         BukkitTask task = Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                     .world(bukkitWorld)
+                    .maxBlocks(maxBlocks)
                     .fastMode(true)
                     .changeSetNull()
                     .limitUnlimited()
@@ -147,6 +151,7 @@ public class FaweBlockHandler implements BlockHandler {
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
         try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(bukkitWorld)
+                .maxBlocks(maxBlocks)
                 .fastMode(true)
                 .forceWNA()
                 .changeSetNull()
@@ -168,6 +173,7 @@ public class FaweBlockHandler implements BlockHandler {
         );
         try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(bukkitWorld)
+                .maxBlocks(maxBlocks)
                 .fastMode(true)
                 .forceWNA()
                 .changeSetNull()

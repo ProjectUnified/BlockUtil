@@ -13,6 +13,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
+import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
 import me.hsgamer.hscore.bukkit.block.box.BlockBox;
 import me.hsgamer.hscore.bukkit.block.iterator.VectorIterator;
@@ -28,8 +29,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class WeBlockHandler implements BlockHandler {
-    private static final int MAX_BLOCKS = Integer.parseInt(System.getProperty("blockutil.worldedit.max-changes", "-1"));
     private static final BlockState AIR = Objects.requireNonNull(BukkitAdapter.asBlockType(Material.AIR)).getDefaultState();
+    private final int maxBlocks = BlockHandlerSettings.MAX_BLOCKS.get();
     private final Plugin plugin;
 
     public WeBlockHandler(Plugin plugin) {
@@ -61,7 +62,7 @@ public class WeBlockHandler implements BlockHandler {
         BukkitTask task = Bukkit.getScheduler().runTask(plugin, () -> {
             try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                     .world(bukkitWorld)
-                    .maxBlocks(MAX_BLOCKS)
+                    .maxBlocks(maxBlocks)
                     .build()
             ) {
                 for (BlockVector3 blockVector : blockVectors) {
@@ -97,7 +98,7 @@ public class WeBlockHandler implements BlockHandler {
         BukkitTask task = Bukkit.getScheduler().runTask(plugin, () -> {
             try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                     .world(bukkitWorld)
-                    .maxBlocks(MAX_BLOCKS)
+                    .maxBlocks(maxBlocks)
                     .build()
             ) {
                 session.setBlocks(region, pattern);
@@ -155,7 +156,7 @@ public class WeBlockHandler implements BlockHandler {
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
         try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(bukkitWorld)
-                .maxBlocks(MAX_BLOCKS)
+                .maxBlocks(maxBlocks)
                 .build()
         ) {
             for (BlockVector3 blockVector : blockVectors) {
@@ -176,7 +177,7 @@ public class WeBlockHandler implements BlockHandler {
         );
         try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(bukkitWorld)
-                .maxBlocks(MAX_BLOCKS)
+                .maxBlocks(maxBlocks)
                 .build()
         ) {
             session.setBlocks(region, AIR);
