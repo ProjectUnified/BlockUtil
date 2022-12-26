@@ -2,7 +2,7 @@ package me.hsgamer.blockutil.api;
 
 import com.cryptomorin.xseries.XMaterial;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
-import me.hsgamer.blockutil.abstraction.BlockUtilSetting;
+import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.fawe.FaweBlockHandler;
 import me.hsgamer.blockutil.vanilla.VanillaBlockHandler;
 import me.hsgamer.blockutil.we.WeBlockHandler;
@@ -23,11 +23,11 @@ public final class BlockUtil {
 
     static {
         CHECKERS.add(new BlockHandlerChecker(
-                plugin -> XMaterial.supports(16) && Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit") && BlockUtilSetting.USE_FAWE.get(),
+                plugin -> XMaterial.supports(16) && Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit") && BlockHandlerSettings.USE_FAWE.get(),
                 FaweBlockHandler::new
         ));
         CHECKERS.add(new BlockHandlerChecker(
-                plugin -> XMaterial.supports(13) && Bukkit.getPluginManager().isPluginEnabled("WorldEdit") && BlockUtilSetting.USE_WE.get(),
+                plugin -> XMaterial.supports(13) && Bukkit.getPluginManager().isPluginEnabled("WorldEdit") && BlockHandlerSettings.USE_WE.get(),
                 WeBlockHandler::new
         ));
     }

@@ -31,6 +31,23 @@ public class FaweBlockHandler implements BlockHandler {
         this.plugin = plugin;
     }
 
+    private static RandomPattern createRandomPattern(ProbabilityCollection<XMaterial> probabilityCollection) {
+        RandomPattern randomPattern = new RandomPattern();
+        probabilityCollection.iterator().forEachRemaining(element -> {
+            Material material = element.getObject().parseMaterial();
+            if (material != null) {
+                randomPattern.add(BukkitAdapter.asBlockType(material), element.getProbability());
+            }
+        });
+        return randomPattern;
+    }
+
+    private static Set<BlockVector3> createBlockVectors(VectorIterator iterator) {
+        Set<BlockVector3> blockVectors = new HashSet<>();
+        iterator.forEachRemaining(vector -> blockVectors.add(BlockVector3.at(vector.getX(), vector.getY(), vector.getZ())));
+        return blockVectors;
+    }
+
     private BlockProcess setBlocks(com.sk89q.worldedit.world.World bukkitWorld, Set<BlockVector3> blockVectors, Pattern pattern) {
         CompletableFuture<Void> blockFuture = new CompletableFuture<>();
         BukkitTask task = Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -93,23 +110,6 @@ public class FaweBlockHandler implements BlockHandler {
                 task.cancel();
             }
         };
-    }
-
-    private static RandomPattern createRandomPattern(ProbabilityCollection<XMaterial> probabilityCollection) {
-        RandomPattern randomPattern = new RandomPattern();
-        probabilityCollection.iterator().forEachRemaining(element -> {
-            Material material = element.getObject().parseMaterial();
-            if (material != null) {
-                randomPattern.add(BukkitAdapter.asBlockType(material), element.getProbability());
-            }
-        });
-        return randomPattern;
-    }
-
-    private static Set<BlockVector3> createBlockVectors(VectorIterator iterator) {
-        Set<BlockVector3> blockVectors = new HashSet<>();
-        iterator.forEachRemaining(vector -> blockVectors.add(BlockVector3.at(vector.getX(), vector.getY(), vector.getZ())));
-        return blockVectors;
     }
 
     @Override
