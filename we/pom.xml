@@ -11,6 +11,10 @@
 
     <artifactId>block-util-we</artifactId>
 
+    <properties>
+        <mc.version>1.13.2-R0.1-SNAPSHOT</mc.version>
+    </properties>
+
     <repositories>
         <repository>
             <id>enginehub-repo</id>
