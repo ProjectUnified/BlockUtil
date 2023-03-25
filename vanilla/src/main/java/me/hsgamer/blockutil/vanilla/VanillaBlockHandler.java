@@ -6,7 +6,11 @@ import com.lewdev.probabilitylib.ProbabilityCollection;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
 import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
-import me.hsgamer.hscore.bukkit.block.iterator.VectorIterator;
+import me.hsgamer.hscore.bukkit.block.BukkitBlockAdapter;
+import me.hsgamer.hscore.minecraft.block.box.BlockBox;
+import me.hsgamer.hscore.minecraft.block.box.Position;
+import me.hsgamer.hscore.minecraft.block.iterator.BasePositionIterator;
+import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -14,6 +18,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 
 public class VanillaBlockHandler implements BlockHandler {
@@ -25,15 +30,42 @@ public class VanillaBlockHandler implements BlockHandler {
         this.plugin = plugin;
     }
 
+    private static PositionIterator toIterator(BlockBox blockBox) {
+        return new BasePositionIterator(blockBox) {
+            @Override
+            public Position initial() {
+                return new Position(blockBox.minX, blockBox.minY, blockBox.minZ);
+            }
+
+            @Override
+            public Position getContinue(Position current) throws NoSuchElementException {
+                if (current.x < blockBox.maxX) {
+                    return new Position(current.x + 1, current.y, current.z);
+                } else if (current.y < blockBox.maxY) {
+                    return new Position(blockBox.minX, current.y + 1, current.z);
+                } else if (current.z < blockBox.maxZ) {
+                    return new Position(blockBox.minX, blockBox.minY, current.z + 1);
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+
+            @Override
+            public boolean hasContinue(Position current) {
+                return current.x < blockBox.maxX || current.y < blockBox.maxY || current.z < blockBox.maxZ;
+            }
+        };
+    }
+
     @Override
-    public BlockProcess setRandomBlocks(World world, VectorIterator iterator, ProbabilityCollection<XMaterial> probabilityCollection) {
+    public BlockProcess setRandomBlocks(World world, PositionIterator iterator, ProbabilityCollection<XMaterial> probabilityCollection) {
         CompletableFuture<Void> future = new CompletableFuture<>();
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
                 for (int i = 0; i < blocksPerTick; i++) {
                     if (iterator.hasNext()) {
-                        Block block = iterator.nextLocation(world).getBlock();
+                        Block block = BukkitBlockAdapter.adapt(world, iterator.next()).getBlock();
                         XBlock.setType(block, probabilityCollection.get(), false);
                     } else {
                         cancel();
@@ -57,14 +89,19 @@ public class VanillaBlockHandler implements BlockHandler {
     }
 
     @Override
-    public BlockProcess clearBlocks(World world, VectorIterator iterator) {
+    public BlockProcess setRandomBlocks(World world, BlockBox blockBox, ProbabilityCollection<XMaterial> probabilityCollection) {
+        return setRandomBlocks(world, toIterator(blockBox), probabilityCollection);
+    }
+
+    @Override
+    public BlockProcess clearBlocks(World world, PositionIterator iterator) {
         CompletableFuture<Void> future = new CompletableFuture<>();
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
                 for (int i = 0; i < blocksPerTick; i++) {
                     if (iterator.hasNext()) {
-                        Block block = iterator.nextLocation(world).getBlock();
+                        Block block = BukkitBlockAdapter.adapt(world, iterator.next()).getBlock();
                         if (block.getType() != Material.AIR) {
                             block.setType(Material.AIR, false);
                         }
@@ -90,12 +127,22 @@ public class VanillaBlockHandler implements BlockHandler {
     }
 
     @Override
-    public void clearBlockFast(World world, VectorIterator iterator) {
+    public BlockProcess clearBlocks(World world, BlockBox blockBox) {
+        return clearBlocks(world, toIterator(blockBox));
+    }
+
+    @Override
+    public void clearBlockFast(World world, PositionIterator iterator) {
         while (iterator.hasNext()) {
-            Block block = iterator.nextLocation(world).getBlock();
+            Block block = BukkitBlockAdapter.adapt(world, iterator.next()).getBlock();
             if (block.getType() != Material.AIR) {
                 block.setType(Material.AIR, false);
             }
         }
+    }
+
+    @Override
+    public void clearBlocksFast(World world, BlockBox blockBox) {
+        clearBlockFast(world, toIterator(blockBox));
     }
 }

@@ -13,8 +13,8 @@ import com.sk89q.worldedit.regions.Region;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
 import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
-import me.hsgamer.hscore.bukkit.block.box.BlockBox;
-import me.hsgamer.hscore.bukkit.block.iterator.VectorIterator;
+import me.hsgamer.hscore.minecraft.block.box.BlockBox;
+import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -44,9 +44,9 @@ public class FaweBlockHandler implements BlockHandler {
         return randomPattern;
     }
 
-    private static Set<BlockVector3> createBlockVectors(VectorIterator iterator) {
+    private static Set<BlockVector3> createBlockVectors(PositionIterator iterator) {
         Set<BlockVector3> blockVectors = new HashSet<>();
-        iterator.forEachRemaining(vector -> blockVectors.add(BlockVector3.at(vector.getX(), vector.getY(), vector.getZ())));
+        iterator.forEachRemaining(position -> blockVectors.add(BlockVector3.at(position.x, position.y, position.z)));
         return blockVectors;
     }
 
@@ -117,7 +117,7 @@ public class FaweBlockHandler implements BlockHandler {
     }
 
     @Override
-    public BlockProcess setRandomBlocks(World world, VectorIterator iterator, ProbabilityCollection<XMaterial> probabilityCollection) {
+    public BlockProcess setRandomBlocks(World world, PositionIterator iterator, ProbabilityCollection<XMaterial> probabilityCollection) {
         if (world == null) return BlockProcess.COMPLETED;
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
@@ -132,7 +132,7 @@ public class FaweBlockHandler implements BlockHandler {
     }
 
     @Override
-    public BlockProcess clearBlocks(World world, VectorIterator iterator) {
+    public BlockProcess clearBlocks(World world, PositionIterator iterator) {
         if (world == null) return BlockProcess.COMPLETED;
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
@@ -145,7 +145,7 @@ public class FaweBlockHandler implements BlockHandler {
     }
 
     @Override
-    public void clearBlockFast(World world, VectorIterator iterator) {
+    public void clearBlockFast(World world, PositionIterator iterator) {
         if (world == null) return;
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
