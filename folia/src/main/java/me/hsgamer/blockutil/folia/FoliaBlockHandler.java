@@ -3,13 +3,11 @@ package me.hsgamer.blockutil.folia;
 import com.cryptomorin.xseries.XBlock;
 import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Objects;
-import com.lewdev.probabilitylib.ProbabilityCollection;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
-import me.hsgamer.blockutil.abstraction.BlockHandler;
 import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
+import me.hsgamer.blockutil.abstraction.SimpleBlockHandler;
 import me.hsgamer.hscore.bukkit.block.BukkitBlockAdapter;
-import me.hsgamer.hscore.minecraft.block.box.BlockBox;
 import me.hsgamer.hscore.minecraft.block.box.Position;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.Bukkit;
@@ -28,7 +26,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class FoliaBlockHandler implements BlockHandler {
+public class FoliaBlockHandler implements SimpleBlockHandler {
     private final int blocksPerTick = Math.max(1, BlockHandlerSettings.BLOCKS_PER_TICK.get());
     private final long blockDelay = Math.max(0, BlockHandlerSettings.BLOCK_DELAY.get());
     private final Plugin plugin;
@@ -37,17 +35,8 @@ public class FoliaBlockHandler implements BlockHandler {
         this.plugin = plugin;
     }
 
-    private static ChunkIndex getChunkIndex(Position position) {
-        int blockX = (int) position.x;
-        int blockZ = (int) position.z;
-        return new ChunkIndex(blockX >> 4, blockZ >> 4);
-    }
-
-    private static MaterialPositionPair wrapMaterialPositionPair(XMaterial material, Position position) {
-        return new MaterialPositionPair(material, position);
-    }
-
-    private BlockProcess setBlocks(World world, PositionIterator iterator, Supplier<XMaterial> materialSupplier) {
+    @Override
+    public BlockProcess setBlocks(World world, PositionIterator iterator, Supplier<XMaterial> materialSupplier) {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
         Set<ScheduledTask> chunkTasks = ConcurrentHashMap.newKeySet();
@@ -72,7 +61,7 @@ public class FoliaBlockHandler implements BlockHandler {
                 if (iterator.hasNext()) {
                     Position position = iterator.next();
                     XMaterial material = materialSupplier.get();
-                    chunkQueueFunction.apply(getChunkIndex(position)).add(wrapMaterialPositionPair(material, position));
+                    chunkQueueFunction.apply(new ChunkIndex(position)).add(new MaterialPositionPair(material, position));
                 } else {
                     scheduledTask.cancel();
                     future.complete(null);
@@ -101,39 +90,6 @@ public class FoliaBlockHandler implements BlockHandler {
         };
     }
 
-    @Override
-    public BlockProcess setRandomBlocks(World world, PositionIterator iterator, ProbabilityCollection<XMaterial> probabilityCollection) {
-        return setBlocks(world, iterator, probabilityCollection::get);
-    }
-
-    @Override
-    public BlockProcess setRandomBlocks(World world, BlockBox blockBox, ProbabilityCollection<XMaterial> probabilityCollection) {
-        return setRandomBlocks(world, BlockHandler.iterator(blockBox), probabilityCollection);
-    }
-
-    @Override
-    public BlockProcess setBlocks(World world, PositionIterator iterator, XMaterial material) {
-        return setBlocks(world, iterator, () -> material);
-    }
-
-    @Override
-    public BlockProcess setBlocks(World world, BlockBox blockBox, XMaterial material) {
-        return setBlocks(world, BlockHandler.iterator(blockBox), material);
-    }
-
-    @Override
-    public void setBlocksFast(World world, PositionIterator iterator, XMaterial material) {
-        while (iterator.hasNext()) {
-            Block block = BukkitBlockAdapter.adapt(world, iterator.next()).getBlock();
-            XBlock.setType(block, material, false);
-        }
-    }
-
-    @Override
-    public void setBlocksFast(World world, BlockBox blockBox, XMaterial material) {
-        setBlocksFast(world, BlockHandler.iterator(blockBox), material);
-    }
-
     private static class ChunkIndex {
         private final int x;
         private final int z;
@@ -141,6 +97,10 @@ public class FoliaBlockHandler implements BlockHandler {
         private ChunkIndex(int x, int z) {
             this.x = x;
             this.z = z;
+        }
+
+        private ChunkIndex(Position position) {
+            this((int) position.x >> 4, (int) position.z >> 4);
         }
 
         @Override
