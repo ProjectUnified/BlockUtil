@@ -1,6 +1,7 @@
 package me.hsgamer.blockutil.test.command;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.lewdev.probabilitylib.ProbabilityCollection;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
 import me.hsgamer.blockutil.test.BlockUtilTest;
 import me.hsgamer.hscore.bukkit.block.BukkitBlockAdapter;
@@ -28,22 +29,26 @@ public class SetBlockCommand extends BlockCommand {
         if (args.length < 1) {
             return false;
         }
-        String material = args[0];
-        Optional<XMaterial> optionalXMaterial = XMaterial.matchXMaterial(material);
-        if (!optionalXMaterial.isPresent()) {
-            player.sendMessage("Invalid material");
-            return true;
-        }
-        XMaterial xMaterial = optionalXMaterial.get();
-        Material bukkitMaterial = xMaterial.parseMaterial();
-        if (bukkitMaterial == null || !bukkitMaterial.isBlock()) {
-            player.sendMessage("Invalid material");
-            return true;
+
+        ProbabilityCollection<XMaterial> materialCollection = new ProbabilityCollection<>();
+        for (String material : args) {
+            Optional<XMaterial> optionalXMaterial = XMaterial.matchXMaterial(material);
+            if (!optionalXMaterial.isPresent()) {
+                player.sendMessage("Invalid material: " + material);
+                return true;
+            }
+            XMaterial xMaterial = optionalXMaterial.get();
+            Material bukkitMaterial = xMaterial.parseMaterial();
+            if (bukkitMaterial == null || !bukkitMaterial.isBlock()) {
+                player.sendMessage("Invalid material: " + material);
+                return true;
+            }
+            materialCollection.add(xMaterial, 1);
         }
 
         World world = pos1.getWorld();
         BlockBox blockBox = new BlockBox(BukkitBlockAdapter.adapt(pos1), BukkitBlockAdapter.adapt(pos2), false);
-        BlockProcess blockProcess = plugin.getBlockHandler().setBlocks(world, blockBox, xMaterial);
+        BlockProcess blockProcess = plugin.getBlockHandler().setRandomBlocks(world, blockBox, materialCollection);
         CompletableFuture.runAsync(() -> {
             while (!blockProcess.isDone()) {
                 try {
@@ -60,11 +65,11 @@ public class SetBlockCommand extends BlockCommand {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
-        if (args.length == 1) {
-            String arg = args[0];
+        if (args.length > 0) {
+            String arg = args[args.length - 1];
             return Arrays.stream(XMaterial.VALUES)
                     .map(XMaterial::name)
-                    .filter(name -> name.startsWith(arg))
+                    .filter(name -> name.toLowerCase().startsWith(arg.toLowerCase()))
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
