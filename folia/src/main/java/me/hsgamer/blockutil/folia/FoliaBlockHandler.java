@@ -45,7 +45,7 @@ public class FoliaBlockHandler implements SimpleBlockHandler {
         Function<ChunkIndex, Queue<MaterialPositionPair>> chunkQueueFunction = index -> chunkMap.computeIfAbsent(index, chunkIndex -> {
             Queue<MaterialPositionPair> queue = new ConcurrentLinkedQueue<>();
             ScheduledTask task = Bukkit.getRegionScheduler().run(plugin, world, chunkIndex.x, chunkIndex.z, s -> {
-                while (!future.isDone()) {
+                while (!future.isDone() && !queue.isEmpty()) {
                     MaterialPositionPair materialLocationPair = queue.poll();
                     if (materialLocationPair == null) continue;
                     Block block = BukkitBlockAdapter.adapt(world, materialLocationPair.position).getBlock();
