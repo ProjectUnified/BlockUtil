@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
 import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.fawe.FaweBlockHandler;
+import me.hsgamer.blockutil.folia.FoliaBlockHandler;
 import me.hsgamer.blockutil.vanilla.VanillaBlockHandler;
 import me.hsgamer.blockutil.we.WeBlockHandler;
 import org.bukkit.Bukkit;
@@ -29,6 +30,17 @@ public final class BlockUtil {
         CHECKERS.add(new BlockHandlerChecker(
                 plugin -> XMaterial.supports(13) && Bukkit.getPluginManager().isPluginEnabled("WorldEdit") && BlockHandlerSettings.USE_WE.get(),
                 WeBlockHandler::new
+        ));
+        CHECKERS.add(new BlockHandlerChecker(
+                plugin -> {
+                    try {
+                        Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                },
+                FoliaBlockHandler::new
         ));
     }
 
