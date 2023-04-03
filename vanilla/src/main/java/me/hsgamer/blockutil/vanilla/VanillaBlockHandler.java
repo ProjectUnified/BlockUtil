@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public class VanillaBlockHandler implements BlockHandler {
     private final int blocksPerTick = Math.max(1, BlockHandlerSettings.BLOCKS_PER_TICK.get());
@@ -26,8 +27,7 @@ public class VanillaBlockHandler implements BlockHandler {
         this.plugin = plugin;
     }
 
-    @Override
-    public BlockProcess setRandomBlocks(World world, PositionIterator iterator, ProbabilityCollection<XMaterial> probabilityCollection) {
+    private BlockProcess setBlocks(World world, PositionIterator iterator, Supplier<XMaterial> materialSupplier) {
         CompletableFuture<Void> future = new CompletableFuture<>();
         BukkitTask task = new BukkitRunnable() {
             @Override
@@ -35,7 +35,7 @@ public class VanillaBlockHandler implements BlockHandler {
                 for (int i = 0; i < blocksPerTick; i++) {
                     if (iterator.hasNext()) {
                         Block block = BukkitBlockAdapter.adapt(world, iterator.next()).getBlock();
-                        XBlock.setType(block, probabilityCollection.get(), false);
+                        XBlock.setType(block, materialSupplier.get(), false);
                     } else {
                         cancel();
                         future.complete(null);
@@ -55,6 +55,11 @@ public class VanillaBlockHandler implements BlockHandler {
                 task.cancel();
             }
         };
+    }
+
+    @Override
+    public BlockProcess setRandomBlocks(World world, PositionIterator iterator, ProbabilityCollection<XMaterial> probabilityCollection) {
+        return setBlocks(world, iterator, probabilityCollection::get);
     }
 
     @Override
@@ -64,33 +69,7 @@ public class VanillaBlockHandler implements BlockHandler {
 
     @Override
     public BlockProcess setBlocks(World world, PositionIterator iterator, XMaterial material) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-        BukkitTask task = new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < blocksPerTick; i++) {
-                    if (iterator.hasNext()) {
-                        Block block = BukkitBlockAdapter.adapt(world, iterator.next()).getBlock();
-                        XBlock.setType(block, material, false);
-                    } else {
-                        cancel();
-                        future.complete(null);
-                        break;
-                    }
-                }
-            }
-        }.runTaskTimer(plugin, blockDelay, blockDelay);
-        return new BlockProcess() {
-            @Override
-            public boolean isDone() {
-                return future.isDone();
-            }
-
-            @Override
-            public void cancel() {
-                task.cancel();
-            }
-        };
+        return setBlocks(world, iterator, () -> material);
     }
 
     @Override
