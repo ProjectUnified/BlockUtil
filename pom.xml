@@ -16,6 +16,7 @@
         <module>fawe</module>
         <module>we</module>
         <module>api</module>
+        <module>test</module>
     </modules>
 
     <properties>
