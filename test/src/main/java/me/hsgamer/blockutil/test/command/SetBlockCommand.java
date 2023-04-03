@@ -6,12 +6,17 @@ import me.hsgamer.blockutil.test.BlockUtilTest;
 import me.hsgamer.hscore.bukkit.block.BukkitBlockAdapter;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class SetBlockCommand extends BlockCommand {
     public SetBlockCommand(BlockUtilTest plugin) {
@@ -30,6 +35,11 @@ public class SetBlockCommand extends BlockCommand {
             return true;
         }
         XMaterial xMaterial = optionalXMaterial.get();
+        Material bukkitMaterial = xMaterial.parseMaterial();
+        if (bukkitMaterial == null || !bukkitMaterial.isBlock()) {
+            player.sendMessage("Invalid material");
+            return true;
+        }
 
         World world = pos1.getWorld();
         BlockBox blockBox = new BlockBox(BukkitBlockAdapter.adapt(pos1), BukkitBlockAdapter.adapt(pos2), false);
@@ -46,5 +56,17 @@ public class SetBlockCommand extends BlockCommand {
             player.sendMessage("Done");
         });
         return true;
+    }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
+        if (args.length == 1) {
+            String arg = args[0];
+            return Arrays.stream(XMaterial.VALUES)
+                    .map(XMaterial::name)
+                    .filter(name -> name.startsWith(arg))
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }
