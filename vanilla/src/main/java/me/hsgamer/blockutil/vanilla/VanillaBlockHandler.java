@@ -11,7 +11,6 @@ import me.hsgamer.hscore.minecraft.block.box.BlockBox;
 import me.hsgamer.hscore.minecraft.block.box.Position;
 import me.hsgamer.hscore.minecraft.block.iterator.BasePositionIterator;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.Plugin;
@@ -94,7 +93,7 @@ public class VanillaBlockHandler implements BlockHandler {
     }
 
     @Override
-    public BlockProcess clearBlocks(World world, PositionIterator iterator) {
+    public BlockProcess setBlocks(World world, PositionIterator iterator, XMaterial material) {
         CompletableFuture<Void> future = new CompletableFuture<>();
         BukkitTask task = new BukkitRunnable() {
             @Override
@@ -102,9 +101,7 @@ public class VanillaBlockHandler implements BlockHandler {
                 for (int i = 0; i < blocksPerTick; i++) {
                     if (iterator.hasNext()) {
                         Block block = BukkitBlockAdapter.adapt(world, iterator.next()).getBlock();
-                        if (block.getType() != Material.AIR) {
-                            block.setType(Material.AIR, false);
-                        }
+                        XBlock.setType(block, material, false);
                     } else {
                         cancel();
                         future.complete(null);
@@ -127,22 +124,20 @@ public class VanillaBlockHandler implements BlockHandler {
     }
 
     @Override
-    public BlockProcess clearBlocks(World world, BlockBox blockBox) {
-        return clearBlocks(world, toIterator(blockBox));
+    public BlockProcess setBlocks(World world, BlockBox blockBox, XMaterial material) {
+        return setBlocks(world, toIterator(blockBox), material);
     }
 
     @Override
-    public void clearBlockFast(World world, PositionIterator iterator) {
+    public void setBlocksFast(World world, PositionIterator iterator, XMaterial material) {
         while (iterator.hasNext()) {
             Block block = BukkitBlockAdapter.adapt(world, iterator.next()).getBlock();
-            if (block.getType() != Material.AIR) {
-                block.setType(Material.AIR, false);
-            }
+            XBlock.setType(block, material, false);
         }
     }
 
     @Override
-    public void clearBlocksFast(World world, BlockBox blockBox) {
-        clearBlockFast(world, toIterator(blockBox));
+    public void setBlocksFast(World world, BlockBox blockBox, XMaterial material) {
+        setBlocksFast(world, toIterator(blockBox), material);
     }
 }

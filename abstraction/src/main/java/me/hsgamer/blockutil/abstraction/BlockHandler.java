@@ -46,18 +46,44 @@ public interface BlockHandler {
         return setRandomBlocks(pair.getKey(), pair.getValue(), probabilityCollection);
     }
 
-    BlockProcess clearBlocks(World world, PositionIterator iterator);
+    BlockProcess setBlocks(World world, PositionIterator iterator, XMaterial material);
 
-    BlockProcess clearBlocks(World world, BlockBox blockBox);
+    BlockProcess setBlocks(World world, BlockBox blockBox, XMaterial material);
+
+    default BlockProcess setBlocks(Collection<Location> locations, XMaterial material) {
+        Pair<World, PositionIterator> pair = iterator(locations);
+        return setBlocks(pair.getKey(), pair.getValue(), material);
+    }
+
+    void setBlocksFast(World world, PositionIterator iterator, XMaterial material);
+
+    void setBlocksFast(World world, BlockBox blockBox, XMaterial material);
+
+    default void setBlocksFast(Collection<Location> locations, XMaterial material) {
+        Pair<World, PositionIterator> pair = iterator(locations);
+        setBlocksFast(pair.getKey(), pair.getValue(), material);
+    }
+
+    default BlockProcess clearBlocks(World world, PositionIterator iterator) {
+        return setBlocks(world, iterator, XMaterial.AIR);
+    }
+
+    default BlockProcess clearBlocks(World world, BlockBox blockBox) {
+        return setBlocks(world, blockBox, XMaterial.AIR);
+    }
 
     default BlockProcess clearBlocks(Collection<Location> locations) {
         Pair<World, PositionIterator> pair = iterator(locations);
         return clearBlocks(pair.getKey(), pair.getValue());
     }
 
-    void clearBlockFast(World world, PositionIterator iterator);
+    default void clearBlockFast(World world, PositionIterator iterator) {
+        setBlocksFast(world, iterator, XMaterial.AIR);
+    }
 
-    void clearBlocksFast(World world, BlockBox blockBox);
+    default void clearBlocksFast(World world, BlockBox blockBox) {
+        setBlocksFast(world, blockBox, XMaterial.AIR);
+    }
 
     default void clearBlocksFast(Collection<Location> locations) {
         Pair<World, PositionIterator> pair = iterator(locations);

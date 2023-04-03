@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class WeBlockHandler implements BlockHandler {
-    private static final BlockState AIR = Objects.requireNonNull(BukkitAdapter.asBlockType(Material.AIR)).getDefaultState();
     private final int maxBlocks = BlockHandlerSettings.MAX_BLOCKS.get();
     private final Plugin plugin;
 
@@ -137,21 +136,23 @@ public class WeBlockHandler implements BlockHandler {
     }
 
     @Override
-    public BlockProcess clearBlocks(World world, PositionIterator iterator) {
+    public BlockProcess setBlocks(World world, PositionIterator iterator, XMaterial material) {
         if (world == null) return BlockProcess.COMPLETED;
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
-        return setBlocks(bukkitWorld, blockVectors, AIR);
+        BlockState blockState = Objects.requireNonNull(BukkitAdapter.asBlockType(material.parseMaterial())).getDefaultState();
+        return setBlocks(bukkitWorld, blockVectors, blockState);
     }
 
     @Override
-    public BlockProcess clearBlocks(World world, BlockBox blockBox) {
-        return setBlocks(world, blockBox, AIR);
+    public BlockProcess setBlocks(World world, BlockBox blockBox, XMaterial material) {
+        return setBlocks(world, blockBox, Objects.requireNonNull(BukkitAdapter.asBlockType(material.parseMaterial())).getDefaultState());
     }
 
     @Override
-    public void clearBlockFast(World world, PositionIterator iterator) {
+    public void setBlocksFast(World world, PositionIterator iterator, XMaterial material) {
         if (world == null) return;
+        BlockState blockState = Objects.requireNonNull(BukkitAdapter.asBlockType(material.parseMaterial())).getDefaultState();
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
         try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
@@ -160,7 +161,7 @@ public class WeBlockHandler implements BlockHandler {
                 .build()
         ) {
             for (BlockVector3 blockVector : blockVectors) {
-                session.setBlock(blockVector, AIR);
+                session.setBlock(blockVector, blockState);
             }
         } catch (MaxChangedBlocksException e) {
             plugin.getLogger().warning("Max blocks exceeded. The process will be stopped");
@@ -168,7 +169,9 @@ public class WeBlockHandler implements BlockHandler {
     }
 
     @Override
-    public void clearBlocksFast(World world, BlockBox blockBox) {
+    public void setBlocksFast(World world, BlockBox blockBox, XMaterial material) {
+        if (world == null) return;
+        BlockState blockState = Objects.requireNonNull(BukkitAdapter.asBlockType(material.parseMaterial())).getDefaultState();
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         CuboidRegion region = new CuboidRegion(
                 bukkitWorld,
@@ -180,7 +183,7 @@ public class WeBlockHandler implements BlockHandler {
                 .maxBlocks(maxBlocks)
                 .build()
         ) {
-            session.setBlocks(region, AIR);
+            session.setBlocks(region, blockState);
         } catch (MaxChangedBlocksException e) {
             plugin.getLogger().warning("Max blocks exceeded. The process will be stopped");
         }

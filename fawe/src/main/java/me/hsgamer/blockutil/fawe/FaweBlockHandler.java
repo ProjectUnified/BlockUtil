@@ -10,6 +10,7 @@ import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.block.BlockType;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
 import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
@@ -132,21 +133,22 @@ public class FaweBlockHandler implements BlockHandler {
     }
 
     @Override
-    public BlockProcess clearBlocks(World world, PositionIterator iterator) {
+    public BlockProcess setBlocks(World world, PositionIterator iterator, XMaterial material) {
         if (world == null) return BlockProcess.COMPLETED;
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
-        return setBlocks(bukkitWorld, blockVectors, BukkitAdapter.asBlockType(Material.AIR));
+        return setBlocks(bukkitWorld, blockVectors, BukkitAdapter.asBlockType(material.parseMaterial()));
     }
 
     @Override
-    public BlockProcess clearBlocks(World world, BlockBox blockBox) {
-        return setBlocks(world, blockBox, BukkitAdapter.asBlockType(Material.AIR));
+    public BlockProcess setBlocks(World world, BlockBox blockBox, XMaterial material) {
+        return setBlocks(world, blockBox, BukkitAdapter.asBlockType(material.parseMaterial()));
     }
 
     @Override
-    public void clearBlockFast(World world, PositionIterator iterator) {
+    public void setBlocksFast(World world, PositionIterator iterator, XMaterial material) {
         if (world == null) return;
+        BlockType blockType = BukkitAdapter.asBlockType(material.parseMaterial());
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
         try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
@@ -159,12 +161,14 @@ public class FaweBlockHandler implements BlockHandler {
                 .compile()
                 .build()
         ) {
-            session.setBlocks(blockVectors, BukkitAdapter.asBlockType(Material.AIR));
+            session.setBlocks(blockVectors, blockType);
         }
     }
 
     @Override
-    public void clearBlocksFast(World world, BlockBox blockBox) {
+    public void setBlocksFast(World world, BlockBox blockBox, XMaterial material) {
+        if (world == null) return;
+        BlockType blockType = BukkitAdapter.asBlockType(material.parseMaterial());
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         CuboidRegion region = new CuboidRegion(
                 bukkitWorld,
@@ -181,7 +185,7 @@ public class FaweBlockHandler implements BlockHandler {
                 .compile()
                 .build()
         ) {
-            session.setBlocks((Region) region, BukkitAdapter.asBlockType(Material.AIR));
+            session.setBlocks((Region) region, blockType);
         }
     }
 }
