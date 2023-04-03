@@ -20,7 +20,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -43,15 +43,19 @@ public class FoliaBlockHandler implements SimpleBlockHandler {
         Map<ChunkIndex, Queue<MaterialPositionPair>> chunkMap = new ConcurrentHashMap<>();
 
         Function<ChunkIndex, Queue<MaterialPositionPair>> chunkQueueFunction = index -> chunkMap.computeIfAbsent(index, chunkIndex -> {
-            Queue<MaterialPositionPair> queue = new ConcurrentLinkedQueue<>();
-            ScheduledTask task = Bukkit.getRegionScheduler().run(plugin, world, chunkIndex.x, chunkIndex.z, s -> {
-                while (!future.isDone() && !queue.isEmpty()) {
+            Queue<MaterialPositionPair> queue = new LinkedBlockingQueue<>();
+            ScheduledTask task = Bukkit.getRegionScheduler().runAtFixedRate(plugin, world, chunkIndex.x, chunkIndex.z, s -> {
+                if (future.isDone() && queue.isEmpty()) {
+                    s.cancel();
+                    return;
+                }
+                while (true) {
                     MaterialPositionPair materialLocationPair = queue.poll();
-                    if (materialLocationPair == null) continue;
+                    if (materialLocationPair == null) break;
                     Block block = BukkitBlockAdapter.adapt(world, materialLocationPair.position).getBlock();
                     XBlock.setType(block, materialLocationPair.material, false);
                 }
-            });
+            }, 1, 1);
             chunkTasks.add(task);
             return queue;
         });
