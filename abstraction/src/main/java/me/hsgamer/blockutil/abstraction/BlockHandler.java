@@ -6,12 +6,14 @@ import me.hsgamer.hscore.bukkit.block.BukkitBlockAdapter;
 import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
 import me.hsgamer.hscore.minecraft.block.box.Position;
+import me.hsgamer.hscore.minecraft.block.iterator.BasePositionIterator;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public interface BlockHandler {
     static Pair<World, PositionIterator> iterator(Collection<Location> locations) {
@@ -35,6 +37,33 @@ public interface BlockHandler {
             }
         };
         return Pair.of(world, wrappedPositionIterator);
+    }
+
+    static PositionIterator iterator(BlockBox blockBox) {
+        return new BasePositionIterator(blockBox) {
+            @Override
+            public Position initial() {
+                return new Position(blockBox.minX, blockBox.minY, blockBox.minZ);
+            }
+
+            @Override
+            public Position getContinue(Position current) throws NoSuchElementException {
+                if (current.x < blockBox.maxX) {
+                    return new Position(current.x + 1, current.y, current.z);
+                } else if (current.y < blockBox.maxY) {
+                    return new Position(blockBox.minX, current.y + 1, current.z);
+                } else if (current.z < blockBox.maxZ) {
+                    return new Position(blockBox.minX, blockBox.minY, current.z + 1);
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+
+            @Override
+            public boolean hasContinue(Position current) {
+                return current.x < blockBox.maxX || current.y < blockBox.maxY || current.z < blockBox.maxZ;
+            }
+        };
     }
 
     BlockProcess setRandomBlocks(World world, PositionIterator iterator, ProbabilityCollection<XMaterial> probabilityCollection);

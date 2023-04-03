@@ -8,8 +8,6 @@ import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
 import me.hsgamer.hscore.bukkit.block.BukkitBlockAdapter;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
-import me.hsgamer.hscore.minecraft.block.box.Position;
-import me.hsgamer.hscore.minecraft.block.iterator.BasePositionIterator;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -17,7 +15,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 
 public class VanillaBlockHandler implements BlockHandler {
@@ -27,33 +24,6 @@ public class VanillaBlockHandler implements BlockHandler {
 
     public VanillaBlockHandler(Plugin plugin) {
         this.plugin = plugin;
-    }
-
-    private static PositionIterator toIterator(BlockBox blockBox) {
-        return new BasePositionIterator(blockBox) {
-            @Override
-            public Position initial() {
-                return new Position(blockBox.minX, blockBox.minY, blockBox.minZ);
-            }
-
-            @Override
-            public Position getContinue(Position current) throws NoSuchElementException {
-                if (current.x < blockBox.maxX) {
-                    return new Position(current.x + 1, current.y, current.z);
-                } else if (current.y < blockBox.maxY) {
-                    return new Position(blockBox.minX, current.y + 1, current.z);
-                } else if (current.z < blockBox.maxZ) {
-                    return new Position(blockBox.minX, blockBox.minY, current.z + 1);
-                } else {
-                    throw new NoSuchElementException();
-                }
-            }
-
-            @Override
-            public boolean hasContinue(Position current) {
-                return current.x < blockBox.maxX || current.y < blockBox.maxY || current.z < blockBox.maxZ;
-            }
-        };
     }
 
     @Override
@@ -89,7 +59,7 @@ public class VanillaBlockHandler implements BlockHandler {
 
     @Override
     public BlockProcess setRandomBlocks(World world, BlockBox blockBox, ProbabilityCollection<XMaterial> probabilityCollection) {
-        return setRandomBlocks(world, toIterator(blockBox), probabilityCollection);
+        return setRandomBlocks(world, BlockHandler.iterator(blockBox), probabilityCollection);
     }
 
     @Override
@@ -125,7 +95,7 @@ public class VanillaBlockHandler implements BlockHandler {
 
     @Override
     public BlockProcess setBlocks(World world, BlockBox blockBox, XMaterial material) {
-        return setBlocks(world, toIterator(blockBox), material);
+        return setBlocks(world, BlockHandler.iterator(blockBox), material);
     }
 
     @Override
@@ -138,6 +108,6 @@ public class VanillaBlockHandler implements BlockHandler {
 
     @Override
     public void setBlocksFast(World world, BlockBox blockBox, XMaterial material) {
-        setBlocksFast(world, toIterator(blockBox), material);
+        setBlocksFast(world, BlockHandler.iterator(blockBox), material);
     }
 }
