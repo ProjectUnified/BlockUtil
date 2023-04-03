@@ -13,47 +13,29 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 public final class BlockUtil {
     private static final BlockFace[] FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
-    private static final List<BlockHandlerChecker> CHECKERS = new ArrayList<>();
-
-    static {
-        CHECKERS.add(new BlockHandlerChecker(
-                plugin -> XMaterial.supports(16) && Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit") && BlockHandlerSettings.USE_FAWE.get(),
-                FaweBlockHandler::new
-        ));
-        CHECKERS.add(new BlockHandlerChecker(
-                plugin -> XMaterial.supports(13) && Bukkit.getPluginManager().isPluginEnabled("WorldEdit") && BlockHandlerSettings.USE_WE.get(),
-                WeBlockHandler::new
-        ));
-        CHECKERS.add(new BlockHandlerChecker(
-                plugin -> {
-                    try {
-                        Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-                        return true;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                },
-                FoliaBlockHandler::new
-        ));
-    }
 
     private BlockUtil() {
         // EMPTY
     }
 
     public static BlockHandler getHandler(Plugin plugin) {
-        for (BlockHandlerChecker checker : CHECKERS) {
-            if (checker.predicate.test(plugin)) {
-                return checker.supplier.apply(plugin);
-            }
+        if (XMaterial.supports(16) && Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit") && BlockHandlerSettings.USE_FAWE.get()) {
+            return new FaweBlockHandler(plugin);
         }
+
+        if (XMaterial.supports(13) && Bukkit.getPluginManager().isPluginEnabled("WorldEdit") && BlockHandlerSettings.USE_WE.get()) {
+            return new WeBlockHandler(plugin);
+        }
+
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return new FoliaBlockHandler(plugin);
+        } catch (Exception ignored) {
+            // EMPTY
+        }
+
         return new VanillaBlockHandler(plugin);
     }
 
@@ -65,15 +47,5 @@ public final class BlockUtil {
             }
         }
         return true;
-    }
-
-    private static class BlockHandlerChecker {
-        private final Predicate<Plugin> predicate;
-        private final Function<Plugin, BlockHandler> supplier;
-
-        private BlockHandlerChecker(Predicate<Plugin> predicate, Function<Plugin, BlockHandler> supplier) {
-            this.predicate = predicate;
-            this.supplier = supplier;
-        }
     }
 }
