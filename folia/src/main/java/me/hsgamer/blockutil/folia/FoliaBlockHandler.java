@@ -15,15 +15,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class FoliaBlockHandler implements SimpleBlockHandler {
@@ -37,59 +30,52 @@ public class FoliaBlockHandler implements SimpleBlockHandler {
 
     @Override
     public BlockProcess setBlocks(World world, PositionIterator iterator, Supplier<XMaterial> materialSupplier) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-
         Set<ScheduledTask> chunkTasks = ConcurrentHashMap.newKeySet();
-        Map<ChunkIndex, Queue<MaterialPositionPair>> chunkMap = new ConcurrentHashMap<>();
 
-        Function<ChunkIndex, Queue<MaterialPositionPair>> chunkQueueFunction = index -> chunkMap.computeIfAbsent(index, chunkIndex -> {
-            Queue<MaterialPositionPair> queue = new LinkedBlockingQueue<>();
-            ScheduledTask task = Bukkit.getRegionScheduler().runAtFixedRate(plugin, world, chunkIndex.x, chunkIndex.z, s -> {
-                if (future.isDone() && queue.isEmpty()) {
-                    s.cancel();
-                    return;
-                }
-                while (true) {
-                    MaterialPositionPair materialLocationPair = queue.poll();
-                    if (materialLocationPair == null) break;
-                    Block block = BukkitBlockAdapter.adapt(world, materialLocationPair.position).getBlock();
-                    XBlock.setType(block, materialLocationPair.material, false);
-                }
-            }, 1, 1);
-            chunkTasks.add(task);
-            return queue;
-        });
-
-        Consumer<ScheduledTask> runnable = scheduledTask -> {
-            for (int i = 0; i < blocksPerTick; i++) {
-                if (iterator.hasNext()) {
-                    Position position = iterator.next();
-                    XMaterial material = materialSupplier.get();
-                    chunkQueueFunction.apply(new ChunkIndex(position)).add(new MaterialPositionPair(material, position));
-                } else {
-                    scheduledTask.cancel();
-                    future.complete(null);
-                    break;
-                }
+        ScheduledTask scheduleChunkTask = Bukkit.getAsyncScheduler().runNow(plugin, scheduledTask -> {
+            Map<ChunkIndex, Queue<MaterialPositionPair>> chunkMap = new HashMap<>();
+            while (iterator.hasNext()) {
+                Position position = iterator.next();
+                XMaterial material = materialSupplier.get();
+                ChunkIndex chunkIndex = new ChunkIndex(position);
+                chunkMap.computeIfAbsent(chunkIndex, index -> new ArrayDeque<>()).add(new MaterialPositionPair(material, position));
             }
-        };
 
-        long blockDelayMillis = Math.max(1, blockDelay * 50L);
-        ScheduledTask task = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, runnable, blockDelayMillis, blockDelayMillis, TimeUnit.MILLISECONDS);
+            for (Map.Entry<ChunkIndex, Queue<MaterialPositionPair>> entry : chunkMap.entrySet()) {
+                ChunkIndex chunkIndex = entry.getKey();
+                Queue<MaterialPositionPair> queue = entry.getValue();
+                ScheduledTask task = Bukkit.getRegionScheduler().runAtFixedRate(plugin, world, chunkIndex.x, chunkIndex.z, s -> {
+                    for (int i = 0; i < blocksPerTick; i++) {
+                        MaterialPositionPair materialLocationPair = queue.poll();
+                        if (materialLocationPair == null) {
+                            s.cancel();
+                            break;
+                        }
+                        Block block = BukkitBlockAdapter.adapt(world, materialLocationPair.position).getBlock();
+                        XBlock.setType(block, materialLocationPair.material, false);
+                    }
+                }, Math.max(1, blockDelay), Math.max(1, blockDelay));
+                chunkTasks.add(task);
+            }
+        });
 
         return new BlockProcess() {
             @Override
             public boolean isDone() {
-                return future.isDone();
+                return (scheduleChunkTask.isCancelled() || scheduleChunkTask.getExecutionState() == ScheduledTask.ExecutionState.FINISHED)
+                        && chunkTasks.stream().allMatch(scheduledTask -> scheduledTask.isCancelled() || scheduledTask.getExecutionState() == ScheduledTask.ExecutionState.FINISHED);
             }
 
             @Override
             public void cancel() {
-                task.cancel();
-                if (!future.isDone()) {
-                    future.completeExceptionally(new RuntimeException("Cancelled"));
+                if (!scheduleChunkTask.isCancelled() && scheduleChunkTask.getExecutionState() != ScheduledTask.ExecutionState.FINISHED) {
+                    scheduleChunkTask.cancel();
                 }
-                chunkTasks.forEach(ScheduledTask::cancel);
+                chunkTasks.forEach(scheduledTask -> {
+                    if (!scheduledTask.isCancelled() && scheduledTask.getExecutionState() != ScheduledTask.ExecutionState.FINISHED) {
+                        scheduledTask.cancel();
+                    }
+                });
             }
         };
     }
