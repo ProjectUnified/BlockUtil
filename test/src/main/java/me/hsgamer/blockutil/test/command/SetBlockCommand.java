@@ -47,7 +47,7 @@ public class SetBlockCommand extends BlockCommand {
         }
 
         World world = pos1.getWorld();
-        BlockBox blockBox = new BlockBox(BukkitBlockAdapter.adapt(pos1), BukkitBlockAdapter.adapt(pos2), false);
+        BlockBox blockBox = new BlockBox(BukkitBlockAdapter.adapt(pos1), BukkitBlockAdapter.adapt(pos2));
         BlockProcess blockProcess = plugin.getBlockHandler().setRandomBlocks(world, blockBox, materialCollection);
         CompletableFuture.runAsync(() -> {
             while (!blockProcess.isDone()) {
