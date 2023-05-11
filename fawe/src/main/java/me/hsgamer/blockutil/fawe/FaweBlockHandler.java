@@ -55,9 +55,11 @@ public class FaweBlockHandler implements BlockHandler {
                 .compile()
                 .build();
         TaskManager.taskManager().async(() -> {
-            session.setBlocks(blockVectors, pattern);
-            session.close();
-            blockFuture.complete(null);
+            try (session) {
+                session.setBlocks(blockVectors, pattern);
+            } finally {
+                blockFuture.complete(null);
+            }
         });
         return new BlockProcess() {
             @Override
@@ -89,9 +91,11 @@ public class FaweBlockHandler implements BlockHandler {
                 .compile()
                 .build();
         TaskManager.taskManager().async(() -> {
-            session.setBlocks((Region) region, pattern);
-            session.close();
-            blockFuture.complete(null);
+            try (session) {
+                session.setBlocks((Region) region, pattern);
+            } finally {
+                blockFuture.complete(null);
+            }
         });
         return new BlockProcess() {
             @Override
