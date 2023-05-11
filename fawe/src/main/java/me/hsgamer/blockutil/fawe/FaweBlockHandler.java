@@ -1,6 +1,7 @@
 package me.hsgamer.blockutil.fawe;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.lewdev.probabilitylib.ProbabilityCollection;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -16,11 +17,8 @@ import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,11 +26,6 @@ import java.util.concurrent.CompletableFuture;
 
 public class FaweBlockHandler implements BlockHandler {
     private final int maxBlocks = BlockHandlerSettings.MAX_BLOCKS.get();
-    private final Plugin plugin;
-
-    public FaweBlockHandler(Plugin plugin) {
-        this.plugin = plugin;
-    }
 
     private static RandomPattern createRandomPattern(ProbabilityCollection<XMaterial> probabilityCollection) {
         RandomPattern randomPattern = new RandomPattern();
@@ -53,20 +46,18 @@ public class FaweBlockHandler implements BlockHandler {
 
     private BlockProcess setBlocks(com.sk89q.worldedit.world.World bukkitWorld, Set<BlockVector3> blockVectors, Pattern pattern) {
         CompletableFuture<Void> blockFuture = new CompletableFuture<>();
-        BukkitTask task = Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
-                    .world(bukkitWorld)
-                    .maxBlocks(maxBlocks)
-                    .fastMode(true)
-                    .changeSetNull()
-                    .limitUnlimited()
-                    .compile()
-                    .build()
-            ) {
-                session.setBlocks(blockVectors, pattern);
-            } finally {
-                blockFuture.complete(null);
-            }
+        EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
+                .world(bukkitWorld)
+                .maxBlocks(maxBlocks)
+                .fastMode(true)
+                .changeSetNull()
+                .limitUnlimited()
+                .compile()
+                .build();
+        TaskManager.taskManager().async(() -> {
+            session.setBlocks(blockVectors, pattern);
+            session.close();
+            blockFuture.complete(null);
         });
         return new BlockProcess() {
             @Override
@@ -76,7 +67,7 @@ public class FaweBlockHandler implements BlockHandler {
 
             @Override
             public void cancel() {
-                task.cancel();
+                session.cancel();
             }
         };
     }
@@ -89,20 +80,18 @@ public class FaweBlockHandler implements BlockHandler {
                 BlockVector3.at(blockBox.maxX, blockBox.maxY, blockBox.maxZ)
         );
         CompletableFuture<Void> blockFuture = new CompletableFuture<>();
-        BukkitTask task = Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
-                    .world(bukkitWorld)
-                    .maxBlocks(maxBlocks)
-                    .fastMode(true)
-                    .changeSetNull()
-                    .limitUnlimited()
-                    .compile()
-                    .build()
-            ) {
-                session.setBlocks((Region) region, pattern);
-            } finally {
-                blockFuture.complete(null);
-            }
+        EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
+                .world(bukkitWorld)
+                .maxBlocks(maxBlocks)
+                .fastMode(true)
+                .changeSetNull()
+                .limitUnlimited()
+                .compile()
+                .build();
+        TaskManager.taskManager().async(() -> {
+            session.setBlocks((Region) region, pattern);
+            session.close();
+            blockFuture.complete(null);
         });
         return new BlockProcess() {
             @Override
@@ -112,7 +101,7 @@ public class FaweBlockHandler implements BlockHandler {
 
             @Override
             public void cancel() {
-                task.cancel();
+                session.cancel();
             }
         };
     }

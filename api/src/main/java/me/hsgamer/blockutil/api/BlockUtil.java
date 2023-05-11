@@ -22,7 +22,7 @@ public final class BlockUtil {
 
     public static BlockHandler getHandler(Plugin plugin) {
         if (XMaterial.supports(16) && Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit") && BlockHandlerSettings.USE_FAWE.get()) {
-            return new FaweBlockHandler(plugin);
+            return new FaweBlockHandler();
         }
 
         if (XMaterial.supports(13) && Bukkit.getPluginManager().isPluginEnabled("WorldEdit") && BlockHandlerSettings.USE_WE.get()) {
