@@ -13,6 +13,7 @@ import org.bukkit.World;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public interface BlockHandler {
@@ -118,4 +119,8 @@ public interface BlockHandler {
         Pair<World, PositionIterator> pair = iterator(locations);
         clearBlockFast(pair.getKey(), pair.getValue());
     }
+
+    BlockProcess setBlocks(World world, Map<XMaterial, Collection<Position>> blockMap);
+
+    void setBlocksFast(World world, Map<XMaterial, Collection<Position>> blockMap);
 }

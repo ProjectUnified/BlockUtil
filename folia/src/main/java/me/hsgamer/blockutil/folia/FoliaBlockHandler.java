@@ -28,20 +28,11 @@ public class FoliaBlockHandler implements SimpleBlockHandler {
         this.plugin = plugin;
     }
 
-    @Override
-    public BlockProcess setBlocks(World world, PositionIterator iterator, Supplier<XMaterial> materialSupplier) {
+    private BlockProcess setBlocks(World world, Supplier<Map<ChunkIndex, Queue<MaterialPositionPair>>> chunkIndexSupplier) {
         Set<ScheduledTask> chunkTasks = ConcurrentHashMap.newKeySet();
 
         ScheduledTask scheduleChunkTask = Bukkit.getAsyncScheduler().runNow(plugin, scheduledTask -> {
-            Map<ChunkIndex, Queue<MaterialPositionPair>> chunkMap = new HashMap<>();
-            while (iterator.hasNext()) {
-                Position position = iterator.next();
-                XMaterial material = materialSupplier.get();
-                ChunkIndex chunkIndex = new ChunkIndex(position);
-                chunkMap.computeIfAbsent(chunkIndex, index -> new ArrayDeque<>()).add(new MaterialPositionPair(material, position));
-            }
-
-            for (Map.Entry<ChunkIndex, Queue<MaterialPositionPair>> entry : chunkMap.entrySet()) {
+            for (Map.Entry<ChunkIndex, Queue<MaterialPositionPair>> entry : chunkIndexSupplier.get().entrySet()) {
                 ChunkIndex chunkIndex = entry.getKey();
                 Queue<MaterialPositionPair> queue = entry.getValue();
                 ScheduledTask task = Bukkit.getRegionScheduler().runAtFixedRate(plugin, world, chunkIndex.x, chunkIndex.z, s -> {
@@ -78,6 +69,35 @@ public class FoliaBlockHandler implements SimpleBlockHandler {
                 });
             }
         };
+    }
+
+    @Override
+    public BlockProcess setBlocks(World world, PositionIterator iterator, Supplier<XMaterial> materialSupplier) {
+        return setBlocks(world, () -> {
+            Map<ChunkIndex, Queue<MaterialPositionPair>> chunkMap = new HashMap<>();
+            while (iterator.hasNext()) {
+                Position position = iterator.next();
+                XMaterial material = materialSupplier.get();
+                ChunkIndex chunkIndex = new ChunkIndex(position);
+                chunkMap.computeIfAbsent(chunkIndex, index -> new ArrayDeque<>()).add(new MaterialPositionPair(material, position));
+            }
+            return chunkMap;
+        });
+    }
+
+    @Override
+    public BlockProcess setBlocks(World world, Map<XMaterial, Collection<Position>> blockMap) {
+        return setBlocks(world, () -> {
+            Map<ChunkIndex, Queue<MaterialPositionPair>> chunkMap = new HashMap<>();
+            for (Map.Entry<XMaterial, Collection<Position>> entry : blockMap.entrySet()) {
+                XMaterial material = entry.getKey();
+                for (Position position : entry.getValue()) {
+                    ChunkIndex chunkIndex = new ChunkIndex(position);
+                    chunkMap.computeIfAbsent(chunkIndex, index -> new ArrayDeque<>()).add(new MaterialPositionPair(material, position));
+                }
+            }
+            return chunkMap;
+        });
     }
 
     private static class ChunkIndex {

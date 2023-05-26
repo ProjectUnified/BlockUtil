@@ -5,10 +5,13 @@ import com.cryptomorin.xseries.XMaterial;
 import com.lewdev.probabilitylib.ProbabilityCollection;
 import me.hsgamer.hscore.bukkit.block.BukkitBlockAdapter;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
+import me.hsgamer.hscore.minecraft.block.box.Position;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public interface SimpleBlockHandler extends BlockHandler {
@@ -45,5 +48,13 @@ public interface SimpleBlockHandler extends BlockHandler {
     @Override
     default void setBlocksFast(World world, BlockBox blockBox, XMaterial material) {
         setBlocksFast(world, BlockHandler.iterator(blockBox), material);
+    }
+
+    @Override
+    default void setBlocksFast(World world, Map<XMaterial, Collection<Position>> blockMap) {
+        blockMap.forEach((material, positions) -> positions.forEach(position -> {
+            Block block = BukkitBlockAdapter.adapt(world, position).getBlock();
+            XBlock.setType(block, material, false);
+        }));
     }
 }

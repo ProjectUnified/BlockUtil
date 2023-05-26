@@ -11,6 +11,7 @@ import me.hsgamer.blockutil.vanilla.VanillaBlockHandler;
 import me.hsgamer.blockutil.we.WeBlockHandler;
 import me.hsgamer.hscore.common.CachedValue;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
+import me.hsgamer.hscore.minecraft.block.box.Position;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,6 +22,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Collection;
+import java.util.Map;
 
 public final class BlockUtil {
     private static final BlockFace[] FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
@@ -127,6 +129,16 @@ public final class BlockUtil {
             @Override
             public void clearBlocksFast(Collection<Location> locations) {
                 cachedValue.get().clearBlocksFast(locations);
+            }
+
+            @Override
+            public BlockProcess setBlocks(World world, Map<XMaterial, Collection<Position>> blockMap) {
+                return cachedValue.get().setBlocks(world, blockMap);
+            }
+
+            @Override
+            public void setBlocksFast(World world, Map<XMaterial, Collection<Position>> blockMap) {
+                cachedValue.get().setBlocksFast(world, blockMap);
             }
         };
     }

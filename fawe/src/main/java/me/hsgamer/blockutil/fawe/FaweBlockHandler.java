@@ -15,13 +15,14 @@ import com.sk89q.worldedit.world.block.BlockType;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
 import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
+import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
+import me.hsgamer.hscore.minecraft.block.box.Position;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class FaweBlockHandler implements BlockHandler {
@@ -38,13 +39,13 @@ public class FaweBlockHandler implements BlockHandler {
         return randomPattern;
     }
 
-    private static Set<BlockVector3> createBlockVectors(PositionIterator iterator) {
+    private static Set<BlockVector3> createBlockVectors(Iterator<Position> iterator) {
         Set<BlockVector3> blockVectors = new HashSet<>();
         iterator.forEachRemaining(position -> blockVectors.add(BlockVector3.at(position.x, position.y, position.z)));
         return blockVectors;
     }
 
-    private BlockProcess setBlocks(com.sk89q.worldedit.world.World bukkitWorld, Set<BlockVector3> blockVectors, Pattern pattern) {
+    private BlockProcess setBlocks(com.sk89q.worldedit.world.World bukkitWorld, List<Pair<Set<BlockVector3>, Pattern>> patternList) {
         CompletableFuture<Void> blockFuture = new CompletableFuture<>();
         EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(bukkitWorld)
@@ -56,7 +57,9 @@ public class FaweBlockHandler implements BlockHandler {
                 .build();
         TaskManager.taskManager().async(() -> {
             try (session) {
-                session.setBlocks(blockVectors, pattern);
+                for (Pair<Set<BlockVector3>, Pattern> pair : patternList) {
+                    session.setBlocks(pair.getKey(), pair.getValue());
+                }
             } finally {
                 blockFuture.complete(null);
             }
@@ -116,7 +119,7 @@ public class FaweBlockHandler implements BlockHandler {
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
         RandomPattern randomPattern = createRandomPattern(probabilityCollection);
-        return setBlocks(bukkitWorld, blockVectors, randomPattern);
+        return setBlocks(bukkitWorld, Collections.singletonList(Pair.of(blockVectors, randomPattern)));
     }
 
     @Override
@@ -130,7 +133,7 @@ public class FaweBlockHandler implements BlockHandler {
         if (world == null) return BlockProcess.COMPLETED;
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
-        return setBlocks(bukkitWorld, blockVectors, BukkitAdapter.asBlockType(material.parseMaterial()));
+        return setBlocks(bukkitWorld, Collections.singletonList(Pair.of(blockVectors, BukkitAdapter.asBlockType(material.parseMaterial()))));
     }
 
     @Override
@@ -179,6 +182,40 @@ public class FaweBlockHandler implements BlockHandler {
                 .build()
         ) {
             session.setBlocks((Region) region, blockType);
+        }
+    }
+
+    @Override
+    public BlockProcess setBlocks(World world, Map<XMaterial, Collection<Position>> blockMap) {
+        if (world == null || blockMap.isEmpty()) return BlockProcess.COMPLETED;
+        List<Pair<Set<BlockVector3>, Pattern>> patternList = new ArrayList<>();
+        for (Map.Entry<XMaterial, Collection<Position>> entry : blockMap.entrySet()) {
+            Pattern pattern = BukkitAdapter.asBlockType(entry.getKey().parseMaterial());
+            Set<BlockVector3> blockVectors = createBlockVectors(entry.getValue().iterator());
+            patternList.add(Pair.of(blockVectors, pattern));
+        }
+        return setBlocks(BukkitAdapter.adapt(world), patternList);
+    }
+
+    @Override
+    public void setBlocksFast(World world, Map<XMaterial, Collection<Position>> blockMap) {
+        if (world == null || blockMap.isEmpty()) return;
+        com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
+        try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
+                .world(bukkitWorld)
+                .maxBlocks(maxBlocks)
+                .fastMode(true)
+                .forceWNA()
+                .changeSetNull()
+                .limitUnlimited()
+                .compile()
+                .build()
+        ) {
+            for (Map.Entry<XMaterial, Collection<Position>> entry : blockMap.entrySet()) {
+                Pattern pattern = BukkitAdapter.asBlockType(entry.getKey().parseMaterial());
+                Set<BlockVector3> blockVectors = createBlockVectors(entry.getValue().iterator());
+                session.setBlocks(blockVectors, pattern);
+            }
         }
     }
 }
