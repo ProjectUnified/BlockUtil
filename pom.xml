@@ -11,7 +11,6 @@
 
     <modules>
         <module>abstraction</module>
-        <module>vanilla</module>
         <module>folia</module>
         <module>fawe</module>
         <module>we</module>

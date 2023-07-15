@@ -41,11 +41,6 @@
         </dependency>
         <dependency>
             <groupId>me.hsgamer</groupId>
-            <artifactId>block-util-vanilla</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>me.hsgamer</groupId>
             <artifactId>block-util-folia</artifactId>
             <version>${project.version}</version>
         </dependency>

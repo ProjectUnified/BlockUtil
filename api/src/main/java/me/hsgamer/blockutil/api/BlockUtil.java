@@ -5,9 +5,9 @@ import com.lewdev.probabilitylib.ProbabilityCollection;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
 import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
+import me.hsgamer.blockutil.abstraction.SimpleBlockHandler;
 import me.hsgamer.blockutil.fawe.FaweBlockHandler;
 import me.hsgamer.blockutil.folia.FoliaBlockHandler;
-import me.hsgamer.blockutil.vanilla.VanillaBlockHandler;
 import me.hsgamer.blockutil.we.WeBlockHandler;
 import me.hsgamer.hscore.common.CachedValue;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
@@ -48,7 +48,7 @@ public final class BlockUtil {
                 // EMPTY
             }
 
-            return new VanillaBlockHandler(plugin);
+            return SimpleBlockHandler.getDefault(plugin);
         });
 
         if (!lazyLoading) {
