@@ -26,6 +26,10 @@ public class FoliaBlockHandler implements SimpleBlockHandler {
         this.plugin = plugin;
     }
 
+    public static boolean isAvailable() {
+        return XMaterial.supports(16) && Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null && BlockHandlerSettings.getBoolean("use-fawe", true);
+    }
+
     private int getBlocksPerTick() {
         String value = BlockHandlerSettings.get("blocks-per-tick", "1");
         try {

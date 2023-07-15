@@ -3,17 +3,12 @@ package me.hsgamer.blockutil.api;
 import com.cryptomorin.xseries.XMaterial;
 import com.lewdev.probabilitylib.ProbabilityCollection;
 import me.hsgamer.blockutil.abstraction.BlockHandler;
-import me.hsgamer.blockutil.abstraction.BlockHandlerSettings;
 import me.hsgamer.blockutil.abstraction.BlockProcess;
 import me.hsgamer.blockutil.abstraction.SimpleBlockHandler;
-import me.hsgamer.blockutil.fawe.FaweBlockHandler;
-import me.hsgamer.blockutil.folia.FoliaBlockHandler;
-import me.hsgamer.blockutil.we.WeBlockHandler;
 import me.hsgamer.hscore.common.CachedValue;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
 import me.hsgamer.hscore.minecraft.block.box.Position;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,33 +16,90 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 public final class BlockUtil {
     private static final BlockFace[] FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
+    private static final String[] handlerClassNames = {
+            "me.hsgamer.blockutil.fawe.FaweBlockHandler",
+            "me.hsgamer.blockutil.we.WeBlockHandler",
+            "me.hsgamer.blockutil.folia.FoliaBlockHandler"
+    };
 
     private BlockUtil() {
         // EMPTY
     }
 
+    private static boolean checkClassDependAvailable(Class<?> clazz) {
+        try {
+            Method method = clazz.getDeclaredMethod("isAvailable");
+            if (method.getReturnType().equals(boolean.class) || method.getReturnType().equals(Boolean.class)) {
+                return false;
+            }
+            return (boolean) method.invoke(null);
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            return true;
+        }
+    }
+
+    private static Optional<BlockHandler> getHandler(Plugin plugin, String className) {
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(className);
+            if (!BlockHandler.class.isAssignableFrom(clazz)) {
+                return Optional.empty();
+            }
+        } catch (ClassNotFoundException e) {
+            return Optional.empty();
+        }
+
+        if (!checkClassDependAvailable(clazz)) {
+            return Optional.empty();
+        }
+
+        Constructor<?> constructor;
+        boolean hasPluginConstructor;
+        try {
+            constructor = clazz.getConstructor(Plugin.class);
+            hasPluginConstructor = true;
+        } catch (NoSuchMethodException e) {
+            try {
+                constructor = clazz.getConstructor();
+                hasPluginConstructor = false;
+            } catch (NoSuchMethodException ex) {
+                return Optional.empty();
+            }
+        }
+
+        BlockHandler blockHandler;
+        try {
+            if (hasPluginConstructor) {
+                //noinspection unchecked
+                blockHandler = (BlockHandler) constructor.newInstance(plugin);
+            } else {
+                //noinspection unchecked
+                blockHandler = (BlockHandler) constructor.newInstance();
+            }
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+
+        return Optional.of(blockHandler);
+    }
+
     public static BlockHandler getHandler(Plugin plugin, boolean lazyLoading) {
         final CachedValue<BlockHandler> cachedValue = CachedValue.of(() -> {
-            if (XMaterial.supports(16) && Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null && BlockHandlerSettings.getBoolean("use-fawe", true)) {
-                return new FaweBlockHandler();
+            for (String className : handlerClassNames) {
+                Optional<BlockHandler> optionalBlockHandler = getHandler(plugin, className);
+                if (optionalBlockHandler.isPresent()) {
+                    return optionalBlockHandler.get();
+                }
             }
-
-            if (XMaterial.supports(13) && Bukkit.getPluginManager().getPlugin("WorldEdit") != null && BlockHandlerSettings.getBoolean("use-we", false)) {
-                return new WeBlockHandler(plugin);
-            }
-
-            try {
-                Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-                return new FoliaBlockHandler(plugin);
-            } catch (Exception ignored) {
-                // EMPTY
-            }
-
             return SimpleBlockHandler.getDefault(plugin);
         });
 

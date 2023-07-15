@@ -26,6 +26,15 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class FaweBlockHandler implements BlockHandler {
+    public static boolean isAvailable() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return true;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
     private static RandomPattern createRandomPattern(ProbabilityCollection<XMaterial> probabilityCollection) {
         RandomPattern randomPattern = new RandomPattern();
         probabilityCollection.iterator().forEachRemaining(element -> {

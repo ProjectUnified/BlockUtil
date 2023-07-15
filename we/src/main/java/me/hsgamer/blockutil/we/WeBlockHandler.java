@@ -35,6 +35,10 @@ public class WeBlockHandler implements BlockHandler {
         this.plugin = plugin;
     }
 
+    public static boolean isAvailable() {
+        return XMaterial.supports(13) && Bukkit.getPluginManager().getPlugin("WorldEdit") != null && BlockHandlerSettings.getBoolean("use-we", false);
+    }
+
     private static RandomPattern createRandomPattern(ProbabilityCollection<XMaterial> probabilityCollection) {
         RandomPattern randomPattern = new RandomPattern();
         probabilityCollection.iterator().forEachRemaining(element -> {
