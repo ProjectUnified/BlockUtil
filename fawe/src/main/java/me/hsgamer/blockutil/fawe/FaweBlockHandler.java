@@ -19,6 +19,7 @@ import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
 import me.hsgamer.hscore.minecraft.block.box.Position;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 
@@ -27,15 +28,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class FaweBlockHandler implements BlockHandler {
     public static boolean isAvailable() {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            return true;
-        } catch (Exception ignored) {
-            return false;
-        }
+        return XMaterial.supports(16) && Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null && BlockHandlerSettings.getBoolean("use-fawe", true);
     }
 
-    private static RandomPattern createRandomPattern(ProbabilityCollection<XMaterial> probabilityCollection) {
+    private RandomPattern createRandomPattern(ProbabilityCollection<XMaterial> probabilityCollection) {
         RandomPattern randomPattern = new RandomPattern();
         probabilityCollection.iterator().forEachRemaining(element -> {
             Material material = element.getObject().parseMaterial();
@@ -46,7 +42,7 @@ public class FaweBlockHandler implements BlockHandler {
         return randomPattern;
     }
 
-    private static Set<BlockVector3> createBlockVectors(Iterator<Position> iterator) {
+    private Set<BlockVector3> createBlockVectors(Iterator<Position> iterator) {
         Set<BlockVector3> blockVectors = new HashSet<>();
         iterator.forEachRemaining(position -> blockVectors.add(BlockVector3.at(position.x, position.y, position.z)));
         return blockVectors;

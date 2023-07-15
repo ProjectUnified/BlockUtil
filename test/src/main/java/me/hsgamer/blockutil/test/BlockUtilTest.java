@@ -16,7 +16,7 @@ import java.util.UUID;
 public class BlockUtilTest extends BasePlugin {
     private final Map<UUID, Location> pos1Map = new HashMap<>();
     private final Map<UUID, Location> pos2Map = new HashMap<>();
-    private final BlockHandler blockHandler = BlockUtil.getHandler(this);
+    private final BlockHandler blockHandler = BlockUtil.getHandler(this, false);
 
     public Optional<Location> getPos1(UUID uuid) {
         return Optional.ofNullable(pos1Map.get(uuid));
@@ -40,7 +40,7 @@ public class BlockUtilTest extends BasePlugin {
 
     @Override
     public void enable() {
-        getLogger().info("Handler: " + getBlockHandler().getClass().getSimpleName());
+        getLogger().info("Handler: " + getBlockHandler().getClass());
         registerCommand(new Pos1Command(this));
         registerCommand(new Pos2Command(this));
         registerCommand(new SetBlockCommand(this));

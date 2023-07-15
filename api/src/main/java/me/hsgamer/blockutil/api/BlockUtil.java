@@ -38,7 +38,7 @@ public final class BlockUtil {
     private static boolean checkClassDependAvailable(Class<?> clazz) {
         try {
             Method method = clazz.getDeclaredMethod("isAvailable");
-            if (method.getReturnType().equals(boolean.class) || method.getReturnType().equals(Boolean.class)) {
+            if (!method.getReturnType().equals(boolean.class) && !method.getReturnType().equals(Boolean.class)) {
                 return false;
             }
             return (boolean) method.invoke(null);
@@ -54,7 +54,7 @@ public final class BlockUtil {
             if (!BlockHandler.class.isAssignableFrom(clazz)) {
                 return Optional.empty();
             }
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
             return Optional.empty();
         }
 
@@ -95,6 +95,7 @@ public final class BlockUtil {
     public static BlockHandler getHandler(Plugin plugin, boolean lazyLoading) {
         final CachedValue<BlockHandler> cachedValue = CachedValue.of(() -> {
             for (String className : handlerClassNames) {
+                System.out.println(className);
                 Optional<BlockHandler> optionalBlockHandler = getHandler(plugin, className);
                 if (optionalBlockHandler.isPresent()) {
                     return optionalBlockHandler.get();

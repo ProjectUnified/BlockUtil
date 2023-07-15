@@ -39,7 +39,7 @@ public class WeBlockHandler implements BlockHandler {
         return XMaterial.supports(13) && Bukkit.getPluginManager().getPlugin("WorldEdit") != null && BlockHandlerSettings.getBoolean("use-we", false);
     }
 
-    private static RandomPattern createRandomPattern(ProbabilityCollection<XMaterial> probabilityCollection) {
+    private RandomPattern createRandomPattern(ProbabilityCollection<XMaterial> probabilityCollection) {
         RandomPattern randomPattern = new RandomPattern();
         probabilityCollection.iterator().forEachRemaining(element -> {
             Material material = element.getObject().parseMaterial();
@@ -53,7 +53,7 @@ public class WeBlockHandler implements BlockHandler {
         return randomPattern;
     }
 
-    private static Set<BlockVector3> createBlockVectors(Iterator<Position> iterator) {
+    private Set<BlockVector3> createBlockVectors(Iterator<Position> iterator) {
         Set<BlockVector3> blockVectors = new HashSet<>();
         iterator.forEachRemaining(position -> blockVectors.add(BlockVector3.at(position.x, position.y, position.z)));
         return blockVectors;
