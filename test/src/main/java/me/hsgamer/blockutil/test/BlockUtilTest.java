@@ -16,7 +16,7 @@ import java.util.UUID;
 public class BlockUtilTest extends BasePlugin {
     private final Map<UUID, Location> pos1Map = new HashMap<>();
     private final Map<UUID, Location> pos2Map = new HashMap<>();
-    private final BlockHandler blockHandler = BlockUtil.getHandler(this, false);
+    private final BlockHandler blockHandler = BlockUtil.getHandler(this);
 
     public Optional<Location> getPos1(UUID uuid) {
         return Optional.ofNullable(pos1Map.get(uuid));
