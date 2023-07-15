@@ -40,6 +40,7 @@ public class BlockUtilTest extends BasePlugin {
 
     @Override
     public void enable() {
+        getLogger().info("Handler: " + getBlockHandler().getClass().getSimpleName());
         registerCommand(new Pos1Command(this));
         registerCommand(new Pos2Command(this));
         registerCommand(new SetBlockCommand(this));
