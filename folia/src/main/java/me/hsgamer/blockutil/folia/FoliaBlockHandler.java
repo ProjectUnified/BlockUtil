@@ -20,15 +20,34 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class FoliaBlockHandler implements SimpleBlockHandler {
-    private final int blocksPerTick = Math.max(1, BlockHandlerSettings.BLOCKS_PER_TICK.get());
-    private final long blockDelay = Math.max(0, BlockHandlerSettings.BLOCK_DELAY.get());
     private final Plugin plugin;
 
     public FoliaBlockHandler(Plugin plugin) {
         this.plugin = plugin;
     }
 
+    private int getBlocksPerTick() {
+        String value = BlockHandlerSettings.get("blocks-per-tick", "1");
+        try {
+            return Math.max(1, Integer.parseInt(value));
+        } catch (NumberFormatException e) {
+            return 1;
+        }
+    }
+
+    private long getBlockDelay() {
+        String value = BlockHandlerSettings.get("block-delay", "0");
+        try {
+            return Math.max(0, Long.parseLong(value));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     private BlockProcess setBlocks(World world, Supplier<Map<ChunkIndex, Queue<MaterialPositionPair>>> chunkIndexSupplier) {
+        int blocksPerTick = getBlocksPerTick();
+        long blockDelay = getBlockDelay();
+
         Set<ScheduledTask> chunkTasks = ConcurrentHashMap.newKeySet();
 
         ScheduledTask scheduleChunkTask = Bukkit.getAsyncScheduler().runNow(plugin, scheduledTask -> {

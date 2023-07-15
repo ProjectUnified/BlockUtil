@@ -33,11 +33,11 @@ public final class BlockUtil {
 
     public static BlockHandler getHandler(Plugin plugin, boolean lazyLoading) {
         final CachedValue<BlockHandler> cachedValue = CachedValue.of(() -> {
-            if (XMaterial.supports(16) && Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null && BlockHandlerSettings.USE_FAWE.get()) {
+            if (XMaterial.supports(16) && Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null && BlockHandlerSettings.getBoolean("use-fawe", true)) {
                 return new FaweBlockHandler();
             }
 
-            if (XMaterial.supports(13) && Bukkit.getPluginManager().getPlugin("WorldEdit") != null && BlockHandlerSettings.USE_WE.get()) {
+            if (XMaterial.supports(13) && Bukkit.getPluginManager().getPlugin("WorldEdit") != null && BlockHandlerSettings.getBoolean("use-we", false)) {
                 return new WeBlockHandler(plugin);
             }
 

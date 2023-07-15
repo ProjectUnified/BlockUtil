@@ -24,10 +24,28 @@ import java.util.function.Supplier;
 public interface SimpleBlockHandler extends BlockHandler {
     static SimpleBlockHandler getDefault(Plugin plugin) {
         return new SimpleBlockHandler() {
+            private int getBlocksPerTick() {
+                String value = BlockHandlerSettings.get("blocks-per-tick", "1");
+                try {
+                    return Math.max(1, Integer.parseInt(value));
+                } catch (NumberFormatException e) {
+                    return 1;
+                }
+            }
+
+            private long getBlockDelay() {
+                String value = BlockHandlerSettings.get("block-delay", "0");
+                try {
+                    return Math.max(0, Long.parseLong(value));
+                } catch (NumberFormatException e) {
+                    return 0;
+                }
+            }
+
             @Override
             public BlockProcess setBlocks(World world, PositionIterator iterator, Supplier<XMaterial> materialSupplier) {
-                int blocksPerTick = Math.max(1, BlockHandlerSettings.BLOCKS_PER_TICK.get());
-                long blockDelay = Math.max(0, BlockHandlerSettings.BLOCK_DELAY.get());
+                int blocksPerTick = getBlocksPerTick();
+                long blockDelay = getBlockDelay();
 
                 CompletableFuture<Void> future = new CompletableFuture<>();
                 BukkitTask task = new BukkitRunnable() {
@@ -60,8 +78,8 @@ public interface SimpleBlockHandler extends BlockHandler {
 
             @Override
             public BlockProcess setBlocks(World world, Map<XMaterial, Collection<Position>> blockMap) {
-                int blocksPerTick = Math.max(1, BlockHandlerSettings.BLOCKS_PER_TICK.get());
-                long blockDelay = Math.max(0, BlockHandlerSettings.BLOCK_DELAY.get());
+                int blocksPerTick = getBlocksPerTick();
+                long blockDelay = getBlockDelay();
 
                 Queue<Pair<XMaterial, Position>> queue = new ArrayDeque<>();
                 blockMap.forEach((material, positions) -> positions.forEach(position -> queue.add(Pair.of(material, position))));

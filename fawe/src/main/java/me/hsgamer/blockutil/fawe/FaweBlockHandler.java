@@ -26,8 +26,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class FaweBlockHandler implements BlockHandler {
-    private final int maxBlocks = BlockHandlerSettings.MAX_BLOCKS.get();
-
     private static RandomPattern createRandomPattern(ProbabilityCollection<XMaterial> probabilityCollection) {
         RandomPattern randomPattern = new RandomPattern();
         probabilityCollection.iterator().forEachRemaining(element -> {
@@ -45,11 +43,20 @@ public class FaweBlockHandler implements BlockHandler {
         return blockVectors;
     }
 
+    private int getMaxBlocks() {
+        String value = BlockHandlerSettings.get("max-blocks", "-1");
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
     private BlockProcess setBlocks(com.sk89q.worldedit.world.World bukkitWorld, List<Pair<Set<BlockVector3>, Pattern>> patternList) {
         CompletableFuture<Void> blockFuture = new CompletableFuture<>();
         EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(bukkitWorld)
-                .maxBlocks(maxBlocks)
+                .maxBlocks(getMaxBlocks())
                 .fastMode(true)
                 .changeSetNull()
                 .limitUnlimited()
@@ -87,7 +94,7 @@ public class FaweBlockHandler implements BlockHandler {
         CompletableFuture<Void> blockFuture = new CompletableFuture<>();
         EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(bukkitWorld)
-                .maxBlocks(maxBlocks)
+                .maxBlocks(getMaxBlocks())
                 .fastMode(true)
                 .changeSetNull()
                 .limitUnlimited()
@@ -149,7 +156,7 @@ public class FaweBlockHandler implements BlockHandler {
         Set<BlockVector3> blockVectors = createBlockVectors(iterator);
         try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(bukkitWorld)
-                .maxBlocks(maxBlocks)
+                .maxBlocks(getMaxBlocks())
                 .fastMode(true)
                 .forceWNA()
                 .changeSetNull()
@@ -173,7 +180,7 @@ public class FaweBlockHandler implements BlockHandler {
         );
         try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(bukkitWorld)
-                .maxBlocks(maxBlocks)
+                .maxBlocks(getMaxBlocks())
                 .fastMode(true)
                 .forceWNA()
                 .changeSetNull()
@@ -203,7 +210,7 @@ public class FaweBlockHandler implements BlockHandler {
         com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
         try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(bukkitWorld)
-                .maxBlocks(maxBlocks)
+                .maxBlocks(getMaxBlocks())
                 .fastMode(true)
                 .forceWNA()
                 .changeSetNull()
