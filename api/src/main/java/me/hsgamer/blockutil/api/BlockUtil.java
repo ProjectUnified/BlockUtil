@@ -95,7 +95,6 @@ public final class BlockUtil {
     public static BlockHandler getHandler(Plugin plugin, boolean lazyLoading) {
         final CachedValue<BlockHandler> cachedValue = CachedValue.of(() -> {
             for (String className : handlerClassNames) {
-                System.out.println(className);
                 Optional<BlockHandler> optionalBlockHandler = getHandler(plugin, className);
                 if (optionalBlockHandler.isPresent()) {
                     return optionalBlockHandler.get();
