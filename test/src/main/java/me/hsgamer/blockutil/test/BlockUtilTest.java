@@ -5,6 +5,7 @@ import me.hsgamer.blockutil.api.BlockUtil;
 import me.hsgamer.blockutil.test.command.Pos1Command;
 import me.hsgamer.blockutil.test.command.Pos2Command;
 import me.hsgamer.blockutil.test.command.SetBlockCommand;
+import me.hsgamer.blockutil.test.command.SettingsCommand;
 import me.hsgamer.hscore.bukkit.baseplugin.BasePlugin;
 import org.bukkit.Location;
 
@@ -44,5 +45,6 @@ public class BlockUtilTest extends BasePlugin {
         registerCommand(new Pos1Command(this));
         registerCommand(new Pos2Command(this));
         registerCommand(new SetBlockCommand(this));
+        registerCommand(new SettingsCommand());
     }
 }
