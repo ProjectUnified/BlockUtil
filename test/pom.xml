@@ -29,11 +29,11 @@
                             <relocations>
                                 <relocation>
                                     <pattern>me.hsgamer.hscore</pattern>
-                                    <shadedPattern>me.hsgamer.blockutil.test.hscore</shadedPattern>
+                                    <shadedPattern>io.github.projectunified.blockutil.test.hscore</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.lewdev.probabilitylib</pattern>
-                                    <shadedPattern>me.hsgamer.blockutil.test.probabilitylib</shadedPattern>
+                                    <shadedPattern>io.github.projectunified.blockutil.test.probabilitylib</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
