@@ -10,4 +10,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>block-util-api</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>me.hsgamer</groupId>
+            <artifactId>hscore-bukkit-block</artifactId>
+            <version>4.5.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lewdev</groupId>
+            <artifactId>probability-lib</artifactId>
+            <version>0.8</version>
+        </dependency>
+    </dependencies>
 </project>

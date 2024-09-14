@@ -32,10 +32,6 @@
                                     <shadedPattern>me.hsgamer.blockutil.test.hscore</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>com.cryptomorin.xseries</pattern>
-                                    <shadedPattern>me.hsgamer.blockutil.test.xseries</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>com.lewdev.probabilitylib</pattern>
                                     <shadedPattern>me.hsgamer.blockutil.test.probabilitylib</shadedPattern>
                                 </relocation>
@@ -55,24 +51,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>me.hsgamer</groupId>
-            <artifactId>block-util-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>me.hsgamer</groupId>
+            <groupId>io.github.projectunified</groupId>
             <artifactId>block-util-fawe</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>me.hsgamer</groupId>
-            <artifactId>block-util-folia</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>me.hsgamer</groupId>
-            <artifactId>block-util-we</artifactId>
-            <version>${project.version}</version>
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>me.hsgamer</groupId>

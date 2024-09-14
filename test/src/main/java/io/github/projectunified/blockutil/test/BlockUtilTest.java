@@ -1,11 +1,10 @@
-package me.hsgamer.blockutil.test;
+package io.github.projectunified.blockutil.test;
 
-import me.hsgamer.blockutil.abstraction.BlockHandler;
-import me.hsgamer.blockutil.api.BlockUtil;
-import me.hsgamer.blockutil.test.command.Pos1Command;
-import me.hsgamer.blockutil.test.command.Pos2Command;
-import me.hsgamer.blockutil.test.command.SetBlockCommand;
-import me.hsgamer.blockutil.test.command.SettingsCommand;
+import io.github.projectunified.blockutil.api.BlockHandler;
+import io.github.projectunified.blockutil.fawe.FaweBlockHandler;
+import io.github.projectunified.blockutil.test.command.Pos1Command;
+import io.github.projectunified.blockutil.test.command.Pos2Command;
+import io.github.projectunified.blockutil.test.command.SetBlockCommand;
 import me.hsgamer.hscore.bukkit.baseplugin.BasePlugin;
 import org.bukkit.Location;
 
@@ -17,7 +16,7 @@ import java.util.UUID;
 public class BlockUtilTest extends BasePlugin {
     private final Map<UUID, Location> pos1Map = new HashMap<>();
     private final Map<UUID, Location> pos2Map = new HashMap<>();
-    private final BlockHandler blockHandler = BlockUtil.getHandler(this);
+    private final BlockHandler blockHandler = new FaweBlockHandler();
 
     public Optional<Location> getPos1(UUID uuid) {
         return Optional.ofNullable(pos1Map.get(uuid));
@@ -45,6 +44,5 @@ public class BlockUtilTest extends BasePlugin {
         registerCommand(new Pos1Command(this));
         registerCommand(new Pos2Command(this));
         registerCommand(new SetBlockCommand(this));
-        registerCommand(new SettingsCommand());
     }
 }

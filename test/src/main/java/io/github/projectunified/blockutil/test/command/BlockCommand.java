@@ -1,6 +1,6 @@
-package me.hsgamer.blockutil.test.command;
+package io.github.projectunified.blockutil.test.command;
 
-import me.hsgamer.blockutil.test.BlockUtilTest;
+import io.github.projectunified.blockutil.test.BlockUtilTest;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

@@ -1,8 +1,7 @@
-main: me.hsgamer.blockutil.test.BlockUtilTest
+main: io.github.projectunified.blockutil.test.BlockUtilTest
 name: BlockUtilTest
 version: "${project.version}"
 api-version: 1.13
-softdepend:
-  - WorldEdit
+depend:
   - FastAsyncWorldEdit
 folia-supported: true

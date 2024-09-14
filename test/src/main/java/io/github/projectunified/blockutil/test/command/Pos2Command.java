@@ -1,17 +1,17 @@
-package me.hsgamer.blockutil.test.command;
+package io.github.projectunified.blockutil.test.command;
 
-import me.hsgamer.blockutil.test.BlockUtilTest;
+import io.github.projectunified.blockutil.test.BlockUtilTest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
 
-public class Pos1Command extends Command {
+public class Pos2Command extends Command {
     private final BlockUtilTest plugin;
 
-    public Pos1Command(BlockUtilTest plugin) {
-        super("pos1", "Set the first position", "/pos1", Collections.emptyList());
+    public Pos2Command(BlockUtilTest plugin) {
+        super("pos2", "Set the second position", "/pos2", Collections.emptyList());
         this.plugin = plugin;
     }
 
@@ -19,8 +19,8 @@ public class Pos1Command extends Command {
     public boolean execute(CommandSender commandSender, String s, String[] strings) {
         if (commandSender instanceof Player) {
             Player player = (Player) commandSender;
-            plugin.setPos1(player.getUniqueId(), player.getLocation());
-            player.sendMessage("Set the first position");
+            plugin.setPos2(player.getUniqueId(), player.getLocation());
+            player.sendMessage("Set the second position");
         } else {
             commandSender.sendMessage("You must be a player");
         }
