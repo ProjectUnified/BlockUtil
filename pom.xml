@@ -13,6 +13,8 @@
         <module>api</module>
         <module>test</module>
         <module>fawe</module>
+        <module>folia</module>
+        <module>simple</module>
     </modules>
 
     <properties>

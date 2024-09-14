@@ -24,6 +24,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class FaweBlockHandler implements BlockHandler {
+    private int maxBlocks = -1;
+
     public static boolean isAvailable() {
         return Version.isAtLeast(16) && Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null;
     }
@@ -49,14 +51,10 @@ public class FaweBlockHandler implements BlockHandler {
         return blockVectors;
     }
 
-    private int getMaxBlocks() {
-        return -1; // TODO: Config
-    }
-
     private BlockProcess runSession(com.sk89q.worldedit.world.World world, Consumer<EditSession> editSessionConsumer, boolean urgent) {
         EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(world)
-                .maxBlocks(getMaxBlocks())
+                .maxBlocks(maxBlocks)
                 .fastMode(true)
                 .changeSetNull()
                 .limitUnlimited()
@@ -110,6 +108,11 @@ public class FaweBlockHandler implements BlockHandler {
                 BlockVector3.at(blockBox.maxX, blockBox.maxY, blockBox.maxZ)
         );
         return runSession(BukkitAdapter.adapt(world), session -> session.setBlocks((Region) region, pattern), urgent);
+    }
+
+    public FaweBlockHandler setMaxBlocks(int maxBlocks) {
+        this.maxBlocks = maxBlocks;
+        return this;
     }
 
     @Override
