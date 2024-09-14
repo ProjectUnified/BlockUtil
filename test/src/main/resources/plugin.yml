@@ -2,6 +2,6 @@ main: io.github.projectunified.blockutil.test.BlockUtilTest
 name: BlockUtilTest
 version: "${project.version}"
 api-version: 1.13
-depend:
+softdepend:
   - FastAsyncWorldEdit
 folia-supported: true

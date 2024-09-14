@@ -2,6 +2,7 @@ package io.github.projectunified.blockutil.test;
 
 import io.github.projectunified.blockutil.api.BlockHandler;
 import io.github.projectunified.blockutil.fawe.FaweBlockHandler;
+import io.github.projectunified.blockutil.folia.FoliaBlockHandler;
 import io.github.projectunified.blockutil.test.command.Pos1Command;
 import io.github.projectunified.blockutil.test.command.Pos2Command;
 import io.github.projectunified.blockutil.test.command.SetBlockCommand;
@@ -16,7 +17,7 @@ import java.util.UUID;
 public class BlockUtilTest extends BasePlugin {
     private final Map<UUID, Location> pos1Map = new HashMap<>();
     private final Map<UUID, Location> pos2Map = new HashMap<>();
-    private final BlockHandler blockHandler = new FaweBlockHandler();
+    private BlockHandler blockHandler;
 
     public Optional<Location> getPos1(UUID uuid) {
         return Optional.ofNullable(pos1Map.get(uuid));
@@ -40,6 +41,15 @@ public class BlockUtilTest extends BasePlugin {
 
     @Override
     public void enable() {
+        if (FoliaBlockHandler.isAvailable()) {
+            blockHandler = new FoliaBlockHandler(this);
+        } else if (FaweBlockHandler.isAvailable()) {
+            blockHandler = new FaweBlockHandler();
+        } else {
+            getLogger().warning("No block handler found");
+            return;
+        }
+
         getLogger().info("Handler: " + getBlockHandler().getClass());
         registerCommand(new Pos1Command(this));
         registerCommand(new Pos2Command(this));
