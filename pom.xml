@@ -15,6 +15,7 @@
         <module>fawe</module>
         <module>folia</module>
         <module>simple</module>
+        <module>vanilla</module>
     </modules>
 
     <properties>
