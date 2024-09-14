@@ -11,10 +11,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
-import io.github.projectunified.blockutil.api.BlockData;
-import io.github.projectunified.blockutil.api.BlockHandler;
-import io.github.projectunified.blockutil.api.BlockProcess;
-import io.github.projectunified.blockutil.api.Pair;
+import io.github.projectunified.blockutil.api.*;
 import me.hsgamer.hscore.minecraft.block.box.BlockBox;
 import me.hsgamer.hscore.minecraft.block.box.Position;
 import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
@@ -27,6 +24,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class FaweBlockHandler implements BlockHandler {
+    public static boolean isAvailable() {
+        return Version.isAtLeast(16) && Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null;
+    }
+
     private BlockState toBlockState(BlockData blockData) {
         if (blockData.state == null) {
             return Objects.requireNonNull(BukkitAdapter.asBlockType(blockData.material)).getDefaultState();
