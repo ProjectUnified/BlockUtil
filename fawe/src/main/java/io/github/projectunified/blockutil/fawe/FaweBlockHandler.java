@@ -20,6 +20,7 @@ import org.bukkit.World;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -52,16 +53,17 @@ public class FaweBlockHandler implements BlockHandler {
     }
 
     private BlockProcess runSession(com.sk89q.worldedit.world.World world, Consumer<EditSession> editSessionConsumer, boolean urgent) {
-        EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
-                .world(world)
-                .maxBlocks(maxBlocks)
-                .fastMode(true)
-                .changeSetNull()
-                .limitUnlimited()
-                .compile()
-                .build();
+        AtomicReference<EditSession> sessionRef = new AtomicReference<>();
         Runnable runnable = () -> {
-            try (session) {
+            try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
+                    .world(world)
+                    .maxBlocks(maxBlocks)
+                    .fastMode(true)
+                    .changeSetNull()
+                    .limitUnlimited()
+                    .compile()
+                    .build()) {
+                sessionRef.set(session);
                 editSessionConsumer.accept(session);
             }
         };
@@ -85,7 +87,11 @@ public class FaweBlockHandler implements BlockHandler {
 
                 @Override
                 public void cancel() {
-                    session.cancel();
+                    blockFuture.cancel(true);
+                    EditSession session = sessionRef.get();
+                    if (session != null) {
+                        session.cancel();
+                    }
                 }
             };
         }
