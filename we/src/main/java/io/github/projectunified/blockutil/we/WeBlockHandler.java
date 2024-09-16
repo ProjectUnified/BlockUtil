@@ -88,6 +88,7 @@ public class WeBlockHandler implements BlockHandler {
 
                 @Override
                 public void cancel() {
+                    blockFuture.cancel(true);
                     task.cancel();
                 }
             };

@@ -109,6 +109,7 @@ public class VanillaBlockHandler implements SimpleBlockHandler {
 
                 @Override
                 public void cancel() {
+                    future.cancel(true);
                     task.cancel();
                 }
             };
@@ -153,6 +154,7 @@ public class VanillaBlockHandler implements SimpleBlockHandler {
 
                 @Override
                 public void cancel() {
+                    future.cancel(true);
                     task.cancel();
                 }
             };
