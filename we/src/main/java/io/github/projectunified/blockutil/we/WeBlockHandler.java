@@ -21,6 +21,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 public class WeBlockHandler implements BlockHandler {
@@ -138,6 +139,35 @@ public class WeBlockHandler implements BlockHandler {
     @Override
     public BlockProcess setBlock(World world, BlockBox blockBox, ProbabilityCollection<BlockData> probabilityCollection, boolean urgent) {
         return setBlocks(world, blockBox, createRandomPattern(probabilityCollection), urgent);
+    }
+
+    @Override
+    public BlockProcess setBlock(World world, PositionIterator iterator, Supplier<BlockData> blockDataSupplier, boolean urgent) {
+        com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
+        return runSession(bukkitWorld, session -> {
+            while (iterator.hasNext()) {
+                Position position = iterator.next();
+                BlockData blockData = blockDataSupplier.get();
+                BlockState blockState = toBlockState(blockData);
+                session.setBlock(BlockVector3.at(position.x, position.y, position.z), blockState);
+            }
+        }, urgent);
+    }
+
+    @Override
+    public BlockProcess setBlock(World world, BlockBox blockBox, Supplier<BlockData> blockDataSupplier, boolean urgent) {
+        com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
+        return runSession(bukkitWorld, session -> {
+            for (int x = blockBox.minX; x <= blockBox.maxX; x++) {
+                for (int y = blockBox.minY; y <= blockBox.maxY; y++) {
+                    for (int z = blockBox.minZ; z <= blockBox.maxZ; z++) {
+                        BlockData blockData = blockDataSupplier.get();
+                        BlockState blockState = toBlockState(blockData);
+                        session.setBlock(BlockVector3.at(x, y, z), blockState);
+                    }
+                }
+            }
+        }, urgent);
     }
 
     @Override

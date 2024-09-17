@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class FaweBlockHandler implements BlockHandler {
     private int maxBlocks = -1;
@@ -139,6 +140,38 @@ public class FaweBlockHandler implements BlockHandler {
     @Override
     public BlockProcess setBlock(World world, BlockBox blockBox, ProbabilityCollection<BlockData> probabilityCollection, boolean urgent) {
         return setBlocks(world, blockBox, createRandomPattern(probabilityCollection), urgent);
+    }
+
+    @Override
+    public BlockProcess setBlock(World world, PositionIterator iterator, Supplier<BlockData> blockDataSupplier, boolean urgent) {
+        com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
+        return runSession(bukkitWorld, session -> {
+            while (iterator.hasNext()) {
+                Position position = iterator.next();
+                int x = (int) Math.floor(position.x);
+                int y = (int) Math.floor(position.y);
+                int z = (int) Math.floor(position.z);
+                BlockData blockData = blockDataSupplier.get();
+                BlockState blockState = toBlockState(blockData);
+                session.setBlock(x, y, z, blockState);
+            }
+        }, urgent);
+    }
+
+    @Override
+    public BlockProcess setBlock(World world, BlockBox blockBox, Supplier<BlockData> blockDataSupplier, boolean urgent) {
+        com.sk89q.worldedit.world.World bukkitWorld = BukkitAdapter.adapt(world);
+        return runSession(bukkitWorld, session -> {
+            for (int x = blockBox.minX; x <= blockBox.maxX; x++) {
+                for (int y = blockBox.minY; y <= blockBox.maxY; y++) {
+                    for (int z = blockBox.minZ; z <= blockBox.maxZ; z++) {
+                        BlockData blockData = blockDataSupplier.get();
+                        BlockState blockState = toBlockState(blockData);
+                        session.setBlock(x, y, z, blockState);
+                    }
+                }
+            }
+        }, urgent);
     }
 
     @Override

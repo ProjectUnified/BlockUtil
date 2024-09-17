@@ -7,6 +7,7 @@ import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.World;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public interface BlockHandler {
     BlockProcess setBlock(World world, PositionIterator iterator, BlockData blockData, boolean urgent);
@@ -16,6 +17,10 @@ public interface BlockHandler {
     BlockProcess setBlock(World world, PositionIterator iterator, ProbabilityCollection<BlockData> probabilityCollection, boolean urgent);
 
     BlockProcess setBlock(World world, BlockBox blockBox, ProbabilityCollection<BlockData> probabilityCollection, boolean urgent);
+
+    BlockProcess setBlock(World world, PositionIterator iterator, Supplier<BlockData> blockDataSupplier, boolean urgent);
+
+    BlockProcess setBlock(World world, BlockBox blockBox, Supplier<BlockData> blockDataSupplier, boolean urgent);
 
     BlockProcess setBlock(World world, List<Pair<Position, BlockData>> blocks, boolean urgent);
 

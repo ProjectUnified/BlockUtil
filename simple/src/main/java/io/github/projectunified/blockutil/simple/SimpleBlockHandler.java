@@ -41,8 +41,6 @@ public interface SimpleBlockHandler extends BlockHandler {
         };
     }
 
-    BlockProcess setBlock(World world, PositionIterator iterator, Supplier<BlockData> blockDataSupplier, boolean urgent);
-
     @Override
     default BlockProcess setBlock(World world, PositionIterator iterator, BlockData blockData, boolean urgent) {
         return setBlock(world, iterator, () -> blockData, urgent);
@@ -61,5 +59,10 @@ public interface SimpleBlockHandler extends BlockHandler {
     @Override
     default BlockProcess setBlock(World world, BlockBox blockBox, ProbabilityCollection<BlockData> probabilityCollection, boolean urgent) {
         return setBlock(world, iterator(blockBox), probabilityCollection::get, urgent);
+    }
+
+    @Override
+    default BlockProcess setBlock(World world, BlockBox blockBox, Supplier<BlockData> blockDataSupplier, boolean urgent) {
+        return setBlock(world, iterator(blockBox), blockDataSupplier, urgent);
     }
 }
