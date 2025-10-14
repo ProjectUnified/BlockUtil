@@ -47,7 +47,7 @@ public class WeBlockHandler implements BlockHandler {
 
     private RandomPattern createRandomPattern(ProbabilityCollection<BlockData> probabilityCollection) {
         RandomPattern randomPattern = new RandomPattern();
-        probabilityCollection.iterator().forEachRemaining(element -> randomPattern.add(toBlockState(element.getObject()), element.getProbability()));
+        probabilityCollection.iterator().forEachRemaining(element -> randomPattern.add(toBlockState(element.getKey()), element.getValue()));
         return randomPattern;
     }
 
