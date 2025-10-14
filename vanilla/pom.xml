@@ -12,7 +12,7 @@
     <artifactId>block-util-vanilla</artifactId>
 
     <properties>
-        <mc.version>1.13.2-R0.1-SNAPSHOT</mc.version>
+        <mc.version>1.13.2-R0.1-20191113.201242-53</mc.version>
     </properties>
 
     <dependencies>
