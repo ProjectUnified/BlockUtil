@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>block-util-test</artifactId>
+    <name>BlockUtil Test</name>
 
     <build>
         <plugins>

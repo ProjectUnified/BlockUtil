@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>block-util-simple</artifactId>
+    <name>BlockUtil Simple</name>
 
     <dependencies>
         <dependency>

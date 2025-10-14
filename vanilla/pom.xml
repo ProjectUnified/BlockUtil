@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>block-util-vanilla</artifactId>
+    <name>BlockUtil Vanilla</name>
 
     <properties>
         <mc.version>1.13.2-R0.1-20191113.201242-53</mc.version>

@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>block-util-folia</artifactId>
+    <name>BlockUtil Folia</name>
 
     <repositories>
         <repository>

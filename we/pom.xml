@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>block-util-we</artifactId>
+    <name>BlockUtil WorldEdit</name>
 
     <properties>
         <mc.version>1.13.2-R0.1-SNAPSHOT</mc.version>
