@@ -1,13 +1,13 @@
 package io.github.projectunified.blockutil.spigot.folia;
 
-import io.github.projectunified.blockutil.spigot.api.BlockData;
-import io.github.projectunified.blockutil.spigot.api.BlockProcess;
-import io.github.projectunified.blockutil.spigot.api.Pair;
+import io.github.projectunified.blockutil.core.box.Position;
+import io.github.projectunified.blockutil.core.iterator.PositionIterator;
+import io.github.projectunified.blockutil.spigot.common.BlockData;
+import io.github.projectunified.blockutil.spigot.common.BlockProcess;
+import io.github.projectunified.blockutil.spigot.common.Pair;
+import io.github.projectunified.blockutil.spigot.core.SpigotBlockAdapter;
 import io.github.projectunified.blockutil.spigot.simple.SimpleBlockHandler;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
-import me.hsgamer.hscore.bukkit.block.BukkitBlockAdapter;
-import me.hsgamer.hscore.minecraft.block.box.Position;
-import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -65,7 +65,7 @@ public class FoliaBlockHandler implements SimpleBlockHandler {
                         if (positionBlockDataPair == null) {
                             break;
                         }
-                        Block block = BukkitBlockAdapter.adapt(world, positionBlockDataPair.key).getBlock();
+                        Block block = SpigotBlockAdapter.adapt(world, positionBlockDataPair.key).getBlock();
                         BlockData blockData = positionBlockDataPair.value;
                         setBlock(block, blockData);
                     }
@@ -86,7 +86,7 @@ public class FoliaBlockHandler implements SimpleBlockHandler {
                                 s.cancel();
                                 break;
                             }
-                            Block block = BukkitBlockAdapter.adapt(world, positionBlockDataPair.key).getBlock();
+                            Block block = SpigotBlockAdapter.adapt(world, positionBlockDataPair.key).getBlock();
                             BlockData blockData = positionBlockDataPair.value;
                             setBlock(block, blockData);
                         }

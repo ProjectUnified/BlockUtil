@@ -1,11 +1,11 @@
 package io.github.projectunified.blockutil.spigot.test.command;
 
 import com.lewdev.probabilitylib.ProbabilityCollection;
-import io.github.projectunified.blockutil.spigot.api.BlockData;
-import io.github.projectunified.blockutil.spigot.api.BlockProcess;
+import io.github.projectunified.blockutil.core.box.BlockBox;
+import io.github.projectunified.blockutil.spigot.common.BlockData;
+import io.github.projectunified.blockutil.spigot.common.BlockProcess;
+import io.github.projectunified.blockutil.spigot.core.SpigotBlockAdapter;
 import io.github.projectunified.blockutil.spigot.test.BlockUtilTest;
-import me.hsgamer.hscore.bukkit.block.BukkitBlockAdapter;
-import me.hsgamer.hscore.minecraft.block.box.BlockBox;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -40,7 +40,7 @@ public class SetBlockCommand extends BlockCommand {
         }
 
         World world = pos1.getWorld();
-        BlockBox blockBox = new BlockBox(BukkitBlockAdapter.adapt(pos1), BukkitBlockAdapter.adapt(pos2));
+        BlockBox blockBox = new BlockBox(SpigotBlockAdapter.adapt(pos1), SpigotBlockAdapter.adapt(pos2));
         BlockProcess blockProcess = plugin.getBlockHandler().setBlock(world, blockBox, materialCollection, false);
         CompletableFuture.runAsync(() -> {
             while (!blockProcess.isDone()) {

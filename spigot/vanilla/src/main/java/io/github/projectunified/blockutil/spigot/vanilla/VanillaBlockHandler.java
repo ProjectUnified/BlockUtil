@@ -1,13 +1,13 @@
 package io.github.projectunified.blockutil.spigot.vanilla;
 
-import io.github.projectunified.blockutil.spigot.api.BlockData;
-import io.github.projectunified.blockutil.spigot.api.BlockProcess;
-import io.github.projectunified.blockutil.spigot.api.Pair;
-import io.github.projectunified.blockutil.spigot.api.Version;
+import io.github.projectunified.blockutil.core.box.Position;
+import io.github.projectunified.blockutil.core.iterator.PositionIterator;
+import io.github.projectunified.blockutil.spigot.common.BlockData;
+import io.github.projectunified.blockutil.spigot.common.BlockProcess;
+import io.github.projectunified.blockutil.spigot.common.Pair;
+import io.github.projectunified.blockutil.spigot.common.Version;
+import io.github.projectunified.blockutil.spigot.core.SpigotBlockAdapter;
 import io.github.projectunified.blockutil.spigot.simple.SimpleBlockHandler;
-import me.hsgamer.hscore.bukkit.block.BukkitBlockAdapter;
-import me.hsgamer.hscore.minecraft.block.box.Position;
-import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -78,7 +78,7 @@ public class VanillaBlockHandler implements SimpleBlockHandler {
         if (urgent) {
             while (iterator.hasNext()) {
                 Position position = iterator.next();
-                Block block = BukkitBlockAdapter.adaptAsBlock(world, position);
+                Block block = SpigotBlockAdapter.adaptAsBlock(world, position);
                 BlockData blockData = blockDataSupplier.get();
                 setBlock(block, blockData);
             }
@@ -90,7 +90,7 @@ public class VanillaBlockHandler implements SimpleBlockHandler {
                 public void run() {
                     for (int i = 0; i < blocksPerTick; i++) {
                         if (iterator.hasNext()) {
-                            Block block = BukkitBlockAdapter.adapt(world, iterator.next()).getBlock();
+                            Block block = SpigotBlockAdapter.adapt(world, iterator.next()).getBlock();
                             BlockData blockData = blockDataSupplier.get();
                             setBlock(block, blockData);
                         } else {
@@ -120,7 +120,7 @@ public class VanillaBlockHandler implements SimpleBlockHandler {
     public BlockProcess setBlock(World world, List<Pair<Position, BlockData>> blocks, boolean urgent) {
         if (urgent) {
             for (Pair<Position, BlockData> pair : blocks) {
-                Block block = BukkitBlockAdapter.adaptAsBlock(world, pair.key);
+                Block block = SpigotBlockAdapter.adaptAsBlock(world, pair.key);
                 BlockData blockData = pair.value;
                 setBlock(block, blockData);
             }
@@ -135,7 +135,7 @@ public class VanillaBlockHandler implements SimpleBlockHandler {
                     for (int i = 0; i < blocksPerTick; i++) {
                         Pair<Position, BlockData> pair = queue.poll();
                         if (pair != null) {
-                            Block block = BukkitBlockAdapter.adapt(world, pair.key).getBlock();
+                            Block block = SpigotBlockAdapter.adapt(world, pair.key).getBlock();
                             BlockData blockData = pair.value;
                             setBlock(block, blockData);
                         } else {

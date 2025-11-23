@@ -11,6 +11,9 @@
 
     <modules>
         <module>spigot</module>
+        <module>core</module>
+        <module>iterator</module>
+        <module>extra</module>
     </modules>
 
     <name>BlockUtil</name>
@@ -46,7 +49,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <mc.version>1.12.2-R0.1-20190527.155359-34</mc.version>
     </properties>
 
     <build>

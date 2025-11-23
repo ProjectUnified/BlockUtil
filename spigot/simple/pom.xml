@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>io.github.projectunified</groupId>
-            <artifactId>block-util-spigot-api</artifactId>
+            <artifactId>block-util-spigot-common</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

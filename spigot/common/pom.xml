@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>io.github.projectunified</groupId>
+        <artifactId>block-util-spigot</artifactId>
+        <version>5.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>block-util-spigot-common</artifactId>
+    <name>BlockUtil Spigot - Common</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.projectunified</groupId>
+            <artifactId>block-util-spigot-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lewdev</groupId>
+            <artifactId>probability-lib</artifactId>
+            <version>0.13</version>
+        </dependency>
+    </dependencies>
+</project>

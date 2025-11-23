@@ -12,6 +12,10 @@
     <artifactId>block-util-spigot-test</artifactId>
     <name>BlockUtil Spigot - Test</name>
 
+    <properties>
+        <minelib.version>1.2.5</minelib.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -29,12 +33,13 @@
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <relocations>
                                 <relocation>
-                                    <pattern>me.hsgamer.hscore</pattern>
-                                    <shadedPattern>io.github.projectunified.blockutil.test.hscore</shadedPattern>
+                                    <pattern>io.github.projectunified.minelib</pattern>
+                                    <shadedPattern>io.github.projectunified.blockutil.test.minelib</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.lewdev.probabilitylib</pattern>
-                                    <shadedPattern>io.github.projectunified.blockutil.test.probabilitylib</shadedPattern>
+                                    <shadedPattern>io.github.projectunified.blockutil.test.probabilitylib
+                                    </shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -61,10 +66,16 @@
             <artifactId>block-util-spigot-folia</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>me.hsgamer</groupId>
-            <artifactId>hscore-bukkit-baseplugin</artifactId>
-            <version>4.3.30</version>
+            <groupId>io.github.projectunified</groupId>
+            <artifactId>minelib-plugin-base</artifactId>
+            <version>${minelib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.projectunified</groupId>
+            <artifactId>minelib-plugin-command</artifactId>
+            <version>${minelib.version}</version>
         </dependency>
     </dependencies>
 </project>

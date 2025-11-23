@@ -1,13 +1,13 @@
 package io.github.projectunified.blockutil.spigot.simple;
 
 import com.lewdev.probabilitylib.ProbabilityCollection;
-import io.github.projectunified.blockutil.spigot.api.BlockData;
-import io.github.projectunified.blockutil.spigot.api.BlockHandler;
-import io.github.projectunified.blockutil.spigot.api.BlockProcess;
-import me.hsgamer.hscore.minecraft.block.box.BlockBox;
-import me.hsgamer.hscore.minecraft.block.box.Position;
-import me.hsgamer.hscore.minecraft.block.iterator.BasePositionIterator;
-import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
+import io.github.projectunified.blockutil.core.box.BlockBox;
+import io.github.projectunified.blockutil.core.box.Position;
+import io.github.projectunified.blockutil.core.iterator.BasePositionIterator;
+import io.github.projectunified.blockutil.core.iterator.PositionIterator;
+import io.github.projectunified.blockutil.spigot.common.BlockData;
+import io.github.projectunified.blockutil.spigot.common.BlockHandler;
+import io.github.projectunified.blockutil.spigot.common.BlockProcess;
 import org.bukkit.World;
 
 import java.util.NoSuchElementException;

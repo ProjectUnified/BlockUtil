@@ -1,18 +1,16 @@
 package io.github.projectunified.blockutil.spigot.test;
 
-import io.github.projectunified.blockutil.spigot.api.BlockHandler;
+import io.github.projectunified.blockutil.spigot.common.BlockHandler;
 import io.github.projectunified.blockutil.spigot.fawe.FaweBlockHandler;
 import io.github.projectunified.blockutil.spigot.folia.FoliaBlockHandler;
 import io.github.projectunified.blockutil.spigot.test.command.Pos1Command;
 import io.github.projectunified.blockutil.spigot.test.command.Pos2Command;
 import io.github.projectunified.blockutil.spigot.test.command.SetBlockCommand;
-import me.hsgamer.hscore.bukkit.baseplugin.BasePlugin;
+import io.github.projectunified.minelib.plugin.base.BasePlugin;
+import io.github.projectunified.minelib.plugin.command.CommandComponent;
 import org.bukkit.Location;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class BlockUtilTest extends BasePlugin {
     private final Map<UUID, Location> pos1Map = new HashMap<>();
@@ -40,6 +38,15 @@ public class BlockUtilTest extends BasePlugin {
     }
 
     @Override
+    protected List<Object> getComponents() {
+        return Collections.singletonList(new CommandComponent(this,
+                new Pos1Command(this),
+                new Pos2Command(this),
+                new SetBlockCommand(this)
+        ));
+    }
+
+    @Override
     public void enable() {
         if (FoliaBlockHandler.isAvailable()) {
             blockHandler = new FoliaBlockHandler(this);
@@ -51,8 +58,5 @@ public class BlockUtilTest extends BasePlugin {
         }
 
         getLogger().info("Handler: " + getBlockHandler().getClass());
-        registerCommand(new Pos1Command(this));
-        registerCommand(new Pos2Command(this));
-        registerCommand(new SetBlockCommand(this));
     }
 }

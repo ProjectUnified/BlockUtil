@@ -11,10 +11,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
-import io.github.projectunified.blockutil.spigot.api.*;
-import me.hsgamer.hscore.minecraft.block.box.BlockBox;
-import me.hsgamer.hscore.minecraft.block.box.Position;
-import me.hsgamer.hscore.minecraft.block.iterator.PositionIterator;
+import io.github.projectunified.blockutil.core.box.BlockBox;
+import io.github.projectunified.blockutil.core.box.Position;
+import io.github.projectunified.blockutil.core.iterator.PositionIterator;
+import io.github.projectunified.blockutil.spigot.common.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
