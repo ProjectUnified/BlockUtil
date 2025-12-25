@@ -9,15 +9,27 @@ import java.util.regex.Pattern;
 public class Version {
     private static final int MAJOR_VERSION;
     private static final int MINOR_VERSION;
+    private static final int PATCH_VERSION;
 
     static {
-        Matcher versionMatcher = Pattern.compile("MC: \\d\\.(\\d+)(\\.(\\d+))?").matcher(Bukkit.getVersion());
+        Matcher versionMatcher = Pattern.compile("MC: (\\d+)\\.(\\d+)(\\.(\\d+))?").matcher(Bukkit.getVersion());
         if (versionMatcher.find()) {
-            MAJOR_VERSION = Integer.parseInt(versionMatcher.group(1));
-            MINOR_VERSION = Optional.ofNullable(versionMatcher.group(3)).filter(s -> !s.isEmpty()).map(Integer::parseInt).orElse(0);
+            int majorVersion = Integer.parseInt(versionMatcher.group(1));
+            int minorVersion = Integer.parseInt(versionMatcher.group(2));
+            int patchVersion = Optional.ofNullable(versionMatcher.group(4)).filter(s -> !s.isEmpty()).map(Integer::parseInt).orElse(0);
+            if (majorVersion == 1) {
+                MAJOR_VERSION = minorVersion;
+                MINOR_VERSION = patchVersion;
+                PATCH_VERSION = 0;
+            } else {
+                MAJOR_VERSION = majorVersion;
+                MINOR_VERSION = minorVersion;
+                PATCH_VERSION = patchVersion;
+            }
         } else {
             MAJOR_VERSION = -1;
             MINOR_VERSION = -1;
+            PATCH_VERSION = -1;
         }
     }
 
